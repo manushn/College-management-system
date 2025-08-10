@@ -1,0 +1,35 @@
+.emesaage-mains{
+    top:0;
+    display: flex;
+    position: absolute;
+    margin-right: 50%;
+    justify-content: center;
+    width: 80%;
+}
+.emessage-cons{
+    background-color: rgb(249, 218, 218);
+    width: 300px;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+.emessage-cons p{
+    text-align: center;
+}
+
+.mesaage-mains{
+    top:0;
+    display: flex;
+    position: absolute;
+    margin-right: 50%;
+    justify-content: center;
+    width: 80%;
+}
+.message-cons{
+    background-color: rgb(149, 255, 149);
+    width: 300px;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+.message-cons p{
+    text-align: center;
+}

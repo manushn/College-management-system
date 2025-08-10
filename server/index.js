@@ -1,0 +1,39 @@
+const express= require('express');
+const app = express();
+const cors= require('cors');
+const dotenv = require('dotenv');
+const mysql = require('mysql2');
+const port=4000;
+
+const login =require("./routes/Login");
+const AdminStaff=require("./routes/admin/AdminStaff");
+
+const VerifyToken=require("./middleware/tokenVerify");
+
+app.use(cors());
+app.use(express.json());
+dotenv.config();
+
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: process.env.DATABASE_USERNAME,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_NAME
+});
+
+db.connect(err => {
+  if (err) throw err;
+  console.log('MySQL Connected');
+});
+
+app.use((req, res, next) => {
+  req.db = db;
+  next();
+});
+
+app.use("/",login)
+app.use('/admin',VerifyToken,AdminStaff);
+
+app.listen(port||4000,()=>{
+    console.log(`Server is running on port ${port}`)
+})

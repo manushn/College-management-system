@@ -1,0 +1,90 @@
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.admin-addstaff-main {
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+}
+
+.admin-addstaff-head {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 5%;
+}
+
+.admin-addstaff-head button {
+  background-color: white;
+  padding: 5px;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.admin-addstaff-form{
+    flex: 1; 
+  overflow-y: auto; 
+  padding-bottom: 20px;
+}
+.admin-addstaff-form form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 15px; 
+  margin: 20px 5%;
+  
+}
+
+.admin-addstaff-form form input,
+.admin-addstaff-form form select,
+.admin-addstaff-form form textarea {
+  width: 100%; 
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.admin-addstaff-form form textarea {
+  resize: vertical; 
+}
+
+.admin-addstaff-form form input:focus,
+.admin-addstaff-form form select:focus,
+.admin-addstaff-form form textarea:focus{
+    outline: none;
+} 
+
+.admin-addstaff-form form button{
+    background-color: white;
+    color: green;
+    border: 1px solid green;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.admin-addstaff-form form button:hover{
+    background-color: green;
+    color: white;
+}
+
+@media (max-width: 768px) {
+  .admin-addstaff-form form {
+    grid-template-columns: repeat(2, 1fr); 
+  }
+  .admin-addstaff-main {
+  display: flex;
+  flex-direction: column;
+  height: 75vh;
+}
+}
+
+
+@media (min-width: 1024px) {
+  .admin-addstaff-form form {
+    grid-template-columns: repeat(4, 1fr); 
+  }
+}

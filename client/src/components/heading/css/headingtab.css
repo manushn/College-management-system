@@ -1,0 +1,42 @@
+.headtab-body{
+    border-bottom: 1px solid rgb(231, 230, 230);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.headtab-left img{
+    width: 200px;
+    padding: 0;
+    margin-left: 5px;
+}
+.headtab-right{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 3%;
+
+}
+.headtab-right button{
+    color: red;
+    background-color: white;
+    border: 1px solid red;
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+
+}
+.headtab-right button:hover{
+    background-color: red;
+    color: white;
+}
+
+@media (max-width: 400px){
+
+.headtab-left img{
+    width: 45%;
+    padding: 0;
+    margin-left: 5px;
+}
+}
+
+

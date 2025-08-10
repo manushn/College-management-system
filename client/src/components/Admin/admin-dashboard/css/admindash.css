@@ -1,0 +1,72 @@
+.sidebar{
+    margin: 0;
+    max-width: 25%;
+}
+
+.slider ul li img{
+    width:30px;
+    
+    
+}
+.slider ul{
+    list-style-type:none;
+    padding-left: 0;
+    cursor: pointer;
+    
+}
+.slider ul li{
+    display: flex;
+    align-items: center;
+    padding-top: 10px;
+    padding-bottom: 30px;
+    padding-left: 5px;
+    
+    
+}
+
+.slider ul li span{
+    padding-left: 5px;
+    cursor: pointer;
+    padding-right: 10px;
+    
+}
+.admin-main{
+    display: flex;
+    flex-direction: row;
+}
+.adminleft{
+    border-right: 1px solid rgb(231, 230, 230);
+    height: 88vh;
+    box-shadow: 1px 0px 2px rgb(231, 230, 230);
+}
+
+.adminslider {
+  width: 180px;
+  transition: transform 0.3s ease;
+}
+
+.adminslider.closed {
+  width: 30px; 
+}
+.adminslider.closed img{
+    width: 20px;
+}
+.adminslider.closed span {
+  display: none; 
+}
+.sidebar-toggle{
+    background-color: white;
+    border: 1px solid rgb(162, 161, 161) ;
+    margin-left: 1px;
+    
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 2px;
+
+}
+.adminright{
+    width: 100%;
+    height: 100%;
+}
+
+
