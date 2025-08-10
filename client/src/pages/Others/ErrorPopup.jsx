@@ -1,7 +1,7 @@
 import React, { useState,useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import "./css/errorpopup.css"
-function ErrorPopup({emessage,duration=4000,onClose}) {
+function ErrorPopup({emessage,duration=3000,onClose}) {
 
     useEffect(() => {
     if (emessage) {

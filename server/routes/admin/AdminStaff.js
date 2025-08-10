@@ -1,76 +1,166 @@
-const express=require("express");
-const router=express.Router();
-const bcrypt = require('bcrypt');
+const express = require("express");
+const router = express.Router();
+const bcrypt = require("bcrypt");
+const multer = require("multer");
+const path = require("path");
 
-router.post("/addstaff",async(req,res)=>{
-    const db=req.db;
-    const staffData=req.body;
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "../../uploads"));
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + "-" + uniqueSuffix + ext);
+  },
+});
+//---------------------------------------------------------------------------------------------
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = /jpeg|jpg|png/;
+  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = allowedTypes.test(file.mimetype);
 
-    try{
+  if (extname && mimetype) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only .jpg, .jpeg, .png files are allowed!"));
+  }
+};
+//---------------------------------------------------------------------------------------------
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: { fileSize: 2 * 1024 * 1024 }
+});
+//---------------------------------------------------------------------------------------------
 
-        const getYear=new Date().getFullYear();
 
-        const lastUserQuery=`
-        SELECT username FROM staff WHERE username LIKE ? ORDER BY username DESC LIMIT 1
-        `;
+router.post("/addstaff", upload.single("photo"), async (req, res) => {
+  const db = req.db;
+  const staffData = req.body;
 
-        const prefix = `NI${year}`;
+  if (req.fileValidationError) {
+    return res.status(400).json({ error: req.fileValidationError });
+  }
 
-        db.query(lastUserQuery, [`${prefix}%`], async (err, results) => {
-            if (err) return res.status(500).json({ error: "Database error", details: err });
+  const requiredFields = [
+    "prefix", "first_name", "last_name", "gender", "date_of_birth",
+    "phone_number", "email", "personal_email", "address", "city", "state", "pincode",
+    "emergency_contact_name", "emergency_contact_number", "designation", "department",
+    "role_type", "employment_type", "reporting_manager", "staff_status",
+    "aadhar_number", "pan_number", "bank_account_number", "bank_name",
+    "ifsc_code", "salary", "highest_qualification", "specialization", "role"
+  ];
 
-            let nextNumber = 1;
-            if (results.length > 0) {
-                
-                const lastUsername = results[0].username;
-                const lastNum = parseInt(lastUsername.slice(-4)); 
-                nextNumber = lastNum + 1;
-            }
+  const missingFields = requiredFields.filter(field => !staffData[field] || staffData[field].toString().trim() === "");
+  if (missingFields.length > 0) {
+    return res.status(203).json({
+      success: false,
+      emessage: "All fields are required",
+    });
+  }
 
-            
-            const username = `${prefix}${String(nextNumber).padStart(4, "0")}`;
 
-            
-            let dob = staffData.date_of_birth.replace(/-/g, ""); 
-            const hashedPassword = await bcrypt.hash(dob, 10);
+  try {
+    const getYear = new Date().getFullYear();
+    const lastUserQuery = `
+      SELECT username FROM staff WHERE username LIKE ? ORDER BY username DESC LIMIT 1
+    `;
+    const prefix = `NI${getYear}`;
 
-            
-            const insertQuery = `
-                INSERT INTO staff (
-                    username, password, prefix, first_name, last_name, gender, date_of_birth,
-                    photo_url, phone_number, email, personal_email, address, city, state, pincode,
-                    emergency_contact_name, emergency_contact_number, designation, department,
-                    role_type, employment_type, reporting_manager, staff_status, aadhar_number,
-                    pan_number, bank_account_number, bank_name, ifsc_code, salary,
-                    highest_qualification, specialization, role
-                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    db.query(lastUserQuery, [`${prefix}%`], async (err, results) => {
+      if (err) return res.status(500).json({ error: "Database error", details: err.message });
+
+      let nextNumber = 1;
+      if (results.length > 0) {
+        const lastUsername = results[0].username;
+        const lastNum = parseInt(lastUsername.slice(-4), 10);
+        if (!isNaN(lastNum)) {
+          nextNumber = lastNum + 1;
+        }
+      }
+
+      const username = `${prefix}${String(nextNumber).padStart(4, "0")}`;
+
+      
+      let dob = staffData.date_of_birth.replace(/-/g, "");
+      const hashedPassword = await bcrypt.hash(dob, 10);
+
+      
+      const photoUrl = req.file
+        ? `/uploads/${req.file.filename}`
+        : `/uploads/default-user.png`;
+
+      const insertQuery = `
+            INSERT INTO staff (
+            username, password, prefix, first_name, last_name, gender, date_of_birth,
+            photo_url, phone_number, email, personal_email, address, city, state, pincode,
+            emergency_contact_name, emergency_contact_number, designation, department,
+            role_type, employment_type, reporting_manager, staff_status, aadhar_number,
+            pan_number, bank_account_number, bank_name, ifsc_code, salary,
+            highest_qualification, specialization, role
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             `;
 
-            db.query(insertQuery, [
-                username, hashedPassword, staffData.prefix, staffData.first_name, staffData.last_name,
-                staffData.gender, staffData.date_of_birth, staffData.photo_url, staffData.phone_number,
-                staffData.email, staffData.personal_email, staffData.address, staffData.city,
-                staffData.state, staffData.pincode, staffData.emergency_contact_name,
-                staffData.emergency_contact_number, staffData.designation, staffData.department,
-                staffData.role_type, staffData.employment_type, staffData.reporting_manager,
-                staffData.staff_status, staffData.aadhar_number, staffData.pan_number,
-                staffData.bank_account_number, staffData.bank_name, staffData.ifsc_code,
-                staffData.salary, staffData.highest_qualification, staffData.specialization,
-                staffData.role
-            ], (err, result) => {
-                if (err) return res.status(500).json({ emessage: "Insert error", error: err });
+      db.query(insertQuery, [
+        username, hashedPassword, staffData.prefix, staffData.first_name, staffData.last_name,
+        staffData.gender, staffData.date_of_birth, photoUrl, staffData.phone_number,
+        staffData.email, staffData.personal_email, staffData.address, staffData.city,
+        staffData.state, staffData.pincode, staffData.emergency_contact_name,
+        staffData.emergency_contact_number, staffData.designation, staffData.department,
+        staffData.role_type, staffData.employment_type, staffData.reporting_manager,
+        staffData.staff_status, staffData.aadhar_number, staffData.pan_number,
+        staffData.bank_account_number, staffData.bank_name, staffData.ifsc_code,
+        staffData.salary, staffData.highest_qualification, staffData.specialization,
+        staffData.role
+      ], (err, result) => {
+        if (err) {
+        console.error("Database insert error:", err);
 
-                res.status(201).json({
-                    success: true,
-                });
+  
+  if (err.code === "ER_DUP_ENTRY") {
+    
+    const match = err.sqlMessage.match(/for key '(?:.*\.)?(\w+)'/);
+    let fieldName = match ? match[1] : "Field";
+
+   
+    const friendlyNames = {
+      aadhar_number: "Aadhar Number",
+      email: "Email",
+      phone_number: "Phone Number",
+      pan_number: "PAN Number"
+    };
+    fieldName = friendlyNames[fieldName] || fieldName.replace(/_/g, " ");
+
+    return res.status(203).json({
+            success: false,
+            emessage: `${fieldName} already exists. Please use a different one.`
             });
+        }
+
+    return res.status(500).json({
+            emessage: "Database insert error",
+            error: err.message
+         });
+        }
+
+        res.status(201).json({
+          success: true,
+          message: "Staff added successfully",
+          username
         });
+      });
+    });
+
+  } catch (error) {
+    console.error("Server error while adding staff:", error);
+    res.status(500).json({
+      emessage: "Server error while Adding Staff",
+      error: error.message
+    });
+  }
+});
+//---------------------------------------------------------------------------------------------
 
 
-    }catch(error){
-        res.status(500).json({emessage:"Server eror while Adding Staff",error:error})
-    }
-
-})
-
-module.exports=router;
+module.exports = router;
