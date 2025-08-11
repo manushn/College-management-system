@@ -1,6 +1,10 @@
 import React, { lazy, useState } from 'react'
-import "./css/adminstaff.css"
-const AddStaff=lazy(()=>import("./AddStaff"));
+
+import "./css/adminstaff.css";
+
+import AddStaff from './AddStaff';
+import AdminStaffView from './AdminStaffView';
+
 import ErrorPopup from '../../../pages/Others/ErrorPopup';
 import MessagePopup from '../../../pages/Others/MessagePopup';
 
@@ -41,7 +45,9 @@ function AdminStaff() {
             />
         ):(
           <>
-            <h4>Staffs</h4>          
+            <AdminStaffView
+            setEmessage={setEmessage}
+            />         
           </>
         )}
         

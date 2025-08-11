@@ -161,6 +161,48 @@ router.post("/addstaff", upload.single("photo"), async (req, res) => {
   }
 });
 //---------------------------------------------------------------------------------------------
+router.get("/getcardstaff",async(req,res)=>{
+    const db=req.db;
 
+    try{
+      db.query('SELECT username ,prefix, first_name,last_name,gender,photo_url,designation,department,staff_status FROM staff;',async(error,result)=>{
+        if(error) return res.status(500).json({emessage:"Database Error",error:error});
+
+        if(result.length===0){
+          return res.status(203).json({emessage:"No Staffs"})
+        }
+
+        return res.status(200).json({Staffdata:result});
+      })
+
+    }catch(error){
+      console.log("Error in Getstaff:",error)
+      return res.status(500).json({emessage:"Server Error in getting staff"})
+    }
+})
+//---------------------------------------------------------------------------------------------
+
+router.post("/getstaffdetails",async(req,res)=>{
+  const db=req.db;
+  const username=req.body.username;
+
+  console.log(username)
+  try{
+      db.query('SELECT * FROM staff WHERE username= ?;',[username],async(error,result)=>{
+        if(error) return res.status(500).json({emessage:"Database Error",error:error});
+
+        if(result.length===0){
+          return res.status(203).json({emessage:"Staff Details not found "})
+        }
+
+        return res.status(200).json({Staffdata:result});
+      })
+
+    }catch(error){
+      console.log("Error in Getstaff:",error)
+      return res.status(500).json({emessage:"Server Error in getting staff"})
+    }
+
+})
 
 module.exports = router;

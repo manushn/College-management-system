@@ -1,11 +1,9 @@
-// src/components/Admin/admin-staff/AddStaff.jsx
 import React, { useState } from "react";
 import axios from "axios";
 import path from "path";
 
 import "./css/addstaff.css";
-import ErrorPopup from "../../../pages/Others/ErrorPopup";
-import MessagePopup from "../../../pages/Others/MessagePopup";
+
 import defaultImg from "../../../assets/default-user.png";
 
 function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {

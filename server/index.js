@@ -4,6 +4,8 @@ const cors= require('cors');
 const dotenv = require('dotenv');
 const mysql = require('mysql2');
 const port=4000;
+const path=require("path");
+
 
 const login =require("./routes/Login");
 const AdminStaff=require("./routes/admin/AdminStaff");
@@ -31,6 +33,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/",login)
 app.use('/admin',VerifyToken,AdminStaff);
 

@@ -1,0 +1,44 @@
+.admin-staff-view-main{
+    margin-left: 10px;
+    max-height: 70vh;      
+  overflow-y: auto;      
+  padding-right: 10px; 
+}
+.staff-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 260px);
+  gap: 15px;
+  margin: 20px 5%;
+  justify-content: center; 
+}
+.staff-card{
+    display: flex;
+    flex-direction: column;
+    border: 1px solid grey;
+    padding: 10px;
+    align-items: center;
+    border-radius: 10px;
+    background-color: rgb(254, 254, 254);
+    box-shadow: 1px 1px 1px grey;
+    cursor: pointer;
+}
+.staff-card:hover{
+    box-shadow: 1px 7px 3px grey;
+}
+
+.staffcard-left img{
+    width: 70px;
+    border: 1px solid grey;
+    border-radius: 5px;
+    margin-top: 15px;
+    background-color: white;
+}
+.staff-card-right h3{
+    text-align: center;
+}
+.staff-card-right p{
+    margin-left: 10px;
+}
+
+
+
