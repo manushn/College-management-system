@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import path from "path";
 
@@ -6,7 +6,7 @@ import "./css/addstaff.css";
 
 import defaultImg from "../../../assets/default-user.png";
 
-function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
+function EditStaff({ selectedStaff ,setIsEditing,setEmessage,setMessage}) {
   const Token = localStorage.getItem("Token");
 
   const emptyState = {
@@ -125,7 +125,7 @@ function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
     setSelectedFile(null);
   };
 
-  const handleSubmit = async (e) => {
+  const handleupdate = async (e) => {
     e.preventDefault();
     setEmessage("");
     setMessage("");
@@ -169,7 +169,7 @@ function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
       });
 
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/admin/addstaff`,
+        `${import.meta.env.VITE_BACKEND_URL}/admin/updatestaff`,
         formData,
         {
           headers: {
@@ -184,7 +184,7 @@ function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
       } else if (response.data.success) {
         setMessage("Staff Added");
         resetForm();
-        setStaffAdd(false);
+        setIsEditing(false);
       }
     } catch (error) {
       console.log("Error in staff add:", error);
@@ -193,30 +193,69 @@ function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
     }
   };
 
+  const GetStaffDetails = async () => {
+    try {
+      if (!selectedStaff) return;
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/admin/getstaffdetails`,
+        { username: selectedStaff },
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data.emessage) {
+        setEmessage(response.data.emessage);
+      }
+      if (response.data.Staffdata && Array.isArray(response.data.Staffdata)) {
+        setStaffData(response.data.Staffdata[0]);
+      } else {
+        setEmessage("Unable to fetch user data")
+        setIsEditing(false)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+  if (selectedStaff) {
+    GetStaffDetails();
+  }
+}, [selectedStaff]);
+
   return (
     <div className="admin-addstaff-main">
       <div className="admin-addstaff-head">
         <h3>Add Staff</h3>
-        <button type="button" onClick={() => {setStaffAdd(false);}}>
+        <button type="button" onClick={() => {setIsEditing(false);}}>
           Back
         </button>
       </div>
 
       <div className="admin-addstaff-form">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleupdate}>
           <div style={{ gridColumn: "1 / -1", display: "flex", gap: 12, alignItems: "center" }}>
             <div>
               <img
-                src={preview}
-                alt="preview"
-                style={{
-                  width: 120,
-                  height: 120,
-                  objectFit: "cover",
-                  borderRadius: 6,
-                  border: "1px solid #ddd"
-                }}
-              />
+  src={
+    preview
+      ? preview
+      : `${import.meta.env.VITE_BACKEND_URL}${staffData.photo_url || ""}`
+  }
+  alt="preview"
+  style={{
+    width: 120,
+    height: 120,
+    objectFit: "cover",
+    borderRadius: 6,
+    border: "1px solid #ddd"
+  }}
+/>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               <input
@@ -299,7 +338,7 @@ function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
             <option value="head">Head</option>
           </select>
           <button type="submit" disabled={submitting}>
-            {submitting ? "Saving..." : "Save Staff"}
+            {submitting ? "Saving..." : "Update Staff"}
           </button>
         </form>
       </div>
@@ -308,4 +347,4 @@ function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
   );
 }
 
-export default AddStaff;
+export default EditStaff;

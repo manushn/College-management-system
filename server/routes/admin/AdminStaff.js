@@ -186,7 +186,7 @@ router.post("/getstaffdetails",async(req,res)=>{
   const db=req.db;
   const username=req.body.username;
 
-  console.log(username)
+  
   try{
       db.query('SELECT * FROM staff WHERE username= ?;',[username],async(error,result)=>{
         if(error) return res.status(500).json({emessage:"Database Error",error:error});
