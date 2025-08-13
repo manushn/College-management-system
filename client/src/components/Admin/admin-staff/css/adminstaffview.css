@@ -40,6 +40,23 @@
     margin-left: 10px;
 }
 
+.admin-staff-filter{
+    display: flex;
+    border: 1px solid grey;
+    width: 200px;
+    padding: 6px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+.admin-staff-filter select{
+    width: 130px;
+    border: none;
+    cursor: pointer;
+    background-color: white;
+}
+.admin-staff-filter select:focus{
+    outline: none;
+}
 .staff-details-head button{
     background-color: white;
     border: 1px solid black;

@@ -1,4 +1,4 @@
-import React, { lazy, useState } from 'react'
+import React, { lazy, useState ,useEffect} from 'react'
 
 import "./css/adminstaff.css";
 
@@ -11,11 +11,15 @@ import MessagePopup from '../../../pages/Others/MessagePopup';
 
 function AdminStaff() {
 
-  const [Search,setSearch]=useState("");
+  const [SearchStaff,setSearchStaff]=useState("");
   const [StaffAdd,setStaffAdd]=useState(false);
+  
+
 
   const [Emessage, setEmessage] = useState("");
   const [Message, setMessage] = useState("");
+
+   
 
 
   return (
@@ -26,8 +30,8 @@ function AdminStaff() {
           <input 
           type="text"
           placeholder='Search'
-          value={Search}
-          onChange={(e)=>{setSearch(e.target.value.trim())}}
+          value={SearchStaff}
+          onChange={(e)=>{setSearchStaff(e.target.value.trim())}}
           />
 
           <button onClick={()=>{(setStaffAdd(true))}}>Add Staff</button>
@@ -46,7 +50,9 @@ function AdminStaff() {
         ):(
           <>
             <AdminStaffView
+            SearchStaff={SearchStaff}
             setEmessage={setEmessage}
+            setMessage={setMessage}
             />         
           </>
         )}

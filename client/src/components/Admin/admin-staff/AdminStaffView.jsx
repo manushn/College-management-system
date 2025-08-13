@@ -2,16 +2,26 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./css/adminstaffview.css";
 import EditStaff from "./EditStaff"; 
-function AdminStaffView({ setEmessage }) {
+
+function AdminStaffView({ setEmessage ,SearchStaff,setMessage}) {
   const [CardData, setCardData] = useState([]);
   const [Staffdetails, setStaffdetails] = useState([]);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
   const Token = localStorage.getItem("Token");
   const [selectedStaff, setSelectedStaff] = useState("");
   const [isEditing, setIsEditing] = useState(false); 
 
+  const [FilterDep,setFilterDep]=useState("");
+ 
+
+
+//---------------------------------------------------------------------------------------------
   const GetStaff = async () => {
     try {
       if (selectedStaff) return;
+      if(debouncedSearch) return;
+      if(FilterDep) return;
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/admin/getcardstaff`,
         {
@@ -34,6 +44,35 @@ function AdminStaffView({ setEmessage }) {
       console.log(error);
     }
   };
+
+//---------------------------------------------------------------------------------------------
+
+  const Getuser= async()=>{
+    if(!debouncedSearch) return;
+    
+    const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/admin/getstaffusername`,
+        { username: debouncedSearch},
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.data.emessage) {
+        setEmessage(response.data.emessage);
+      }
+      if (response.data.Staffdata && Array.isArray(response.data.Staffdata)) {
+        setCardData(response.data.Staffdata);
+      } else {
+        setCardData([]);
+      }
+
+
+  };
+
+//---------------------------------------------------------------------------------------------
 
   const GetStaffDetails = async () => {
     try {
@@ -63,20 +102,98 @@ function AdminStaffView({ setEmessage }) {
     }
   };
 
+//---------------------------------------------------------------------------------------------
+
+const getFilteredStaff=async()=>{
+   if(!FilterDep) return;
+   try{
+    const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/admin/getfilterstaff`,
+        { department:FilterDep},
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data.emessage) {
+        setEmessage(response.data.emessage);
+      }
+      if (response.data.Staffdata && Array.isArray(response.data.Staffdata)) {
+        setCardData(response.data.Staffdata);
+      } else {
+        setCardData([]);
+      }
+
+   }catch(err){
+    console.log(err)
+   }
+}
+//---------------------------------------------------------------------------------------------
+
+
+  useEffect(() => {
+    if(SearchStaff.length===0){
+      setDebouncedSearch("")
+    }
+    const handler = setTimeout(() => {
+      setDebouncedSearch(SearchStaff);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [SearchStaff]);
+
+//---------------------------------------------------------------------------------------------
+
+
+  useEffect(()=>{
+    if(debouncedSearch){
+      Getuser();
+    }
+
+  },[debouncedSearch])
+
+//---------------------------------------------------------------------------------------------
+
   useEffect(() => {
     GetStaff();
   }, []);
 
+  useEffect(()=>{
+    getFilteredStaff()
+  },[FilterDep])
+//---------------------------------------------------------------------------------------------
+
   useEffect(() => {
     GetStaff();
     GetStaffDetails();
-  }, [selectedStaff]);
+  }, [selectedStaff,isEditing,debouncedSearch,FilterDep]);
+
+//---------------------------------------------------------------------------------------------
 
   return (
     <div className="admin-staff-view-main">
+
       {CardData.length === 0 ? (
-        <>
-          <h2>Staff View</h2>
+        <> 
+          
+          <div className="admin-staff-filter">
+                <label> Filter By:</label>
+                <select  value={FilterDep} onChange={(e)=>{setFilterDep(e.target.value)}} >
+                  <option value="">Department</option>
+                  <option value="ARTIFICIAL INTELLIGENCE AND DATA SCIENCE">ARTIFICIAL INTELLIGENCE AND DATA SCIENCE</option>
+                  <option value="COMPUTER SCIENCE ENGINEERING">COMPUTER SCIENCE ENGINEERING</option>
+                  <option value="INFORMATION TECHNOLOGY">INFORMATION TECHNOLOGY</option>
+                  <option value="MECHANICAL ENGINEERING">MECHANICAL ENGINEERING</option>
+                  <option value="ELECTRONICS AND COMMUNICATION ENGINEERING">ELECTRONICS AND COMMUNICATION ENGINEERING</option>
+                  <option value="ELECTRICAL AND ELECTRONICS ENGINEERING">ELECTRICAL AND ELECTRONICS ENGINEERING</option>
+                </select>
+                
+          </div> 
           <p>No staff data found.</p>
         </>
       ) : selectedStaff ? (
@@ -85,7 +202,7 @@ function AdminStaffView({ setEmessage }) {
             selectedStaff={selectedStaff}
             setIsEditing={setIsEditing}
             setEmessage={setEmessage}
-            setMessage={() => {}}
+            setMessage={setMessage}
             refreshStaffDetails={GetStaffDetails}
           />
         ) : Staffdetails.length > 0 ? (
@@ -209,6 +326,21 @@ function AdminStaffView({ setEmessage }) {
           <p>Loading staff details...</p>
         )
       ) : (
+        <>
+          <div className="admin-staff-filter">
+                <label> Filter By:</label>
+                <select  value={FilterDep} onChange={(e)=>{setFilterDep(e.target.value)}} >
+                  <option value="">Department</option>
+                  <option value="ARTIFICIAL INTELLIGENCE AND DATA SCIENCE">ARTIFICIAL INTELLIGENCE AND DATA SCIENCE</option>
+                  <option value="COMPUTER SCIENCE ENGINEERING">COMPUTER SCIENCE ENGINEERING</option>
+                  <option value="INFORMATION TECHNOLOGY">INFORMATION TECHNOLOGY</option>
+                  <option value="MECHANICAL ENGINEERING">MECHANICAL ENGINEERING</option>
+                  <option value="ELECTRONICS AND COMMUNICATION ENGINEERING">ELECTRONICS AND COMMUNICATION ENGINEERING</option>
+                  <option value="ELECTRICAL AND ELECTRONICS ENGINEERING">ELECTRICAL AND ELECTRONICS ENGINEERING</option>
+                </select>
+                
+          </div>        
+        
         <div className="staff-cards">
           {CardData.map((staff) => (
             <div
@@ -236,6 +368,7 @@ function AdminStaffView({ setEmessage }) {
             </div>
           ))}
         </div>
+        </>
       )}
     </div>
   );

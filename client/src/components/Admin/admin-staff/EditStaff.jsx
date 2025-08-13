@@ -182,7 +182,7 @@ function EditStaff({ selectedStaff ,setIsEditing,setEmessage,setMessage}) {
       if (response.data.emessage) {
         setEmessage(response.data.emessage);
       } else if (response.data.success) {
-        setMessage("Staff Added");
+        setMessage("Staff updated");
         resetForm();
         setIsEditing(false);
       }
@@ -194,33 +194,51 @@ function EditStaff({ selectedStaff ,setIsEditing,setEmessage,setMessage}) {
   };
 
   const GetStaffDetails = async () => {
-    try {
-      if (!selectedStaff) return;
+  try {
+    if (!selectedStaff) return;
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/admin/getstaffdetails`,
-        { username: selectedStaff },
-        {
-          headers: {
-            Authorization: `Bearer ${Token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    const response = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/admin/getstaffdetails`,
+      { username: selectedStaff },
+      {
+        headers: {
+          Authorization: `Bearer ${Token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-      if (response.data.emessage) {
-        setEmessage(response.data.emessage);
-      }
-      if (response.data.Staffdata && Array.isArray(response.data.Staffdata)) {
-        setStaffData(response.data.Staffdata[0]);
-      } else {
-        setEmessage("Unable to fetch user data")
-        setIsEditing(false)
-      }
-    } catch (error) {
-      console.log(error);
+    if (response.data.emessage) {
+      setEmessage(response.data.emessage);
     }
-  };
+    if (response.data.Staffdata && Array.isArray(response.data.Staffdata)) {
+      const staffInfo = response.data.Staffdata[0];
+      
+      
+      if (staffInfo.date_of_birth) {
+        const date = new Date(staffInfo.date_of_birth);
+        staffInfo.date_of_birth = date.toISOString().split('T')[0];
+      }
+      
+      
+      if (staffInfo.salary) {
+        staffInfo.salary = parseInt(staffInfo.salary).toString();
+      }
+      
+      setStaffData(staffInfo);
+      
+      
+      if (staffInfo.photo_url && staffInfo.photo_url !== '/uploads/default-user.png') {
+        setPreview(`${import.meta.env.VITE_BACKEND_URL}${staffInfo.photo_url}`);
+      }
+    } else {
+      setEmessage("Unable to fetch user data");
+      setIsEditing(false);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   useEffect(() => {
   if (selectedStaff) {
@@ -242,20 +260,21 @@ function EditStaff({ selectedStaff ,setIsEditing,setEmessage,setMessage}) {
           <div style={{ gridColumn: "1 / -1", display: "flex", gap: 12, alignItems: "center" }}>
             <div>
               <img
-  src={
-    preview
-      ? preview
-      : `${import.meta.env.VITE_BACKEND_URL}${staffData.photo_url || ""}`
-  }
-  alt="preview"
-  style={{
-    width: 120,
-    height: 120,
-    objectFit: "cover",
-    borderRadius: 6,
-    border: "1px solid #ddd"
-  }}
-/>
+                src={
+                    selectedFile
+                    ? preview 
+                    : staffData.photo_url
+                    ? `${import.meta.env.VITE_BACKEND_URL}${staffData.photo_url}`
+                    : defaultImg
+                  }
+                alt="preview"
+                style={{
+                width: 120,
+                objectFit: "cover",
+                borderRadius: 6,
+                border: "1px solid #ddd"
+                  }}
+                />
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               <input
