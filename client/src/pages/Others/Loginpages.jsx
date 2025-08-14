@@ -104,7 +104,7 @@ useEffect(()=>{
                 type="text"
                 value={username}
                 placeholder='Username'
-                onChange={(e)=>{setusername(e.target.value.trim().toLowerCase())}}
+                onChange={(e)=>{setusername(e.target.value.trim())}}
                 />
                 <label>Password</label>
                 <input

@@ -1,7 +1,6 @@
 use nicetech;
 CREATE TABLE staff (
     username VARCHAR(50) PRIMARY KEY,
-    password VARCHAR(255) NOT NULL,
     prefix ENUM('Mr', 'Mrs', 'Miss') NOT NULL,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
@@ -34,4 +33,14 @@ CREATE TABLE staff (
     role ENUM('staff', 'head') DEFAULT 'staff'
 );
 
-SELECT * from staff
+SELECT * from staff;
+SELECT username ,prefix, first_name,last_name,gender,photo_url,designation,department,staff_status from staff;
+
+SELECT username FROM staff WHERE username LIKE "NI2025%" ORDER BY username DESC LIMIT 2;
+
+SELECT * FROM staff where username = "NI20250001";
+ALTER TABLE staff DROP COLUMN password;
+ALTER TABLE staff MODIFY role ENUM('staff', 'head', 'admin') DEFAULT 'staff';
+
+drop table users;
+select * from users ;
