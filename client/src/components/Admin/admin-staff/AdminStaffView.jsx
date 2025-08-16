@@ -315,9 +315,24 @@ const getFilteredStaff=async()=>{
                   <b>Access Level:</b> {Staffdetails[0].role}
                 </p>
                 <p>
+                  <b>Joined On:</b> {Staffdetails[0].joining_date?.split("T")[0]}
+                </p>
+                <p>
                   <b>Employee Status:</b>
                   {Staffdetails[0].staff_status}
                 </p>
+                {Staffdetails[0].updated_by&&(
+                    <>
+                     <p>
+                        <b>Updated At: </b>
+                        {Staffdetails[0].updated_at?.split("T")[0]}
+                    </p>
+                     <p>
+                        <b>Updated By: </b>
+                        { Staffdetails[0].updated_by}
+                      </p>
+                    </>
+                )}
 
                 <div className="staff-details-body-con-btn">
                   <button onClick={() => setIsEditing(true)}>Edit</button>

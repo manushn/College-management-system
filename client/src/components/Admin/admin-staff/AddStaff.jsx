@@ -39,6 +39,7 @@ function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
     highest_qualification: "",
     specialization: "",
     role: "",
+    joining_date:""
   };
 
   const [staffData, setStaffData] = useState(emptyState);
@@ -293,10 +294,21 @@ function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
           <input type="text" inputMode="numeric" pattern="[0-9]*" name="salary" value={staffData.salary} onChange={handleNumberChange} placeholder="Salary" required />
           <input type="text" name="highest_qualification" value={staffData.highest_qualification} onChange={handleTextChange} placeholder="Highest Qualification" required />
           <input type="text" name="specialization" value={staffData.specialization} onChange={handleTextChange} placeholder="Specialization" required />
+          <input
+            type={staffData.joining_date ? "date" : "text"}
+            name="joining_date"
+            value={staffData.joining_date}
+            onChange={handleTextChange}
+            onFocus={(e) => (e.target.type = "date")}
+            onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }}
+            placeholder="JoiningDate"
+            required
+          />
           <select name="role" value={staffData.role} onChange={handleSelectChange} required>
             <option value="">Role</option>
             <option value="staff">Staff</option>
             <option value="head">Head</option>
+            <option value="admin">Admin</option>
           </select>
           <button type="submit" disabled={submitting}>
             {submitting ? "Saving..." : "Save Staff"}

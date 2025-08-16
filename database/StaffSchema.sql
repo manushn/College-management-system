@@ -1,6 +1,6 @@
 use nicetech;
 CREATE TABLE staff (
-    username VARCHAR(50) PRIMARY KEY,
+     VARCHAR(50) PRIMARY KEY,
     prefix ENUM('Mr', 'Mrs', 'Miss') NOT NULL,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
@@ -31,6 +31,8 @@ CREATE TABLE staff (
     highest_qualification VARCHAR(100),
     specialization VARCHAR(100),
     role ENUM('staff', 'head') DEFAULT 'staff'
+    joining_date DATE NOT NULL
+    created_at 
 );
 
 SELECT * from staff;

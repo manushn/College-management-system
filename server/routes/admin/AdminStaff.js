@@ -49,7 +49,7 @@ router.post("/addstaff", upload.single("photo"), async (req, res) => {
     "emergency_contact_name", "emergency_contact_number", "designation", "department",
     "role_type", "employment_type", "reporting_manager", "staff_status",
     "aadhar_number", "pan_number", "bank_account_number", "bank_name",
-    "ifsc_code", "salary", "highest_qualification", "specialization", "role"
+    "ifsc_code", "salary", "highest_qualification", "specialization", "joining_date","role"
   ];
 
   const missingFields = requiredFields.filter(field => !staffData[field] || staffData[field].toString().trim() === "");
@@ -86,7 +86,7 @@ router.post("/addstaff", upload.single("photo"), async (req, res) => {
     }
 
     const username = `${prefix}${String(nextNumber).padStart(4, "0")}`;
-
+    
     
     const hashedPassword = await bcrypt.hash(staffData.date_of_birth, 10);
 
@@ -101,8 +101,8 @@ router.post("/addstaff", upload.single("photo"), async (req, res) => {
         emergency_contact_name, emergency_contact_number, designation, department,
         role_type, employment_type, reporting_manager, staff_status, aadhar_number,
         pan_number, bank_account_number, bank_name, ifsc_code, salary,
-        highest_qualification, specialization, role
-      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        highest_qualification, specialization, role,joining_date
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     `;
 
    
@@ -122,7 +122,7 @@ router.post("/addstaff", upload.single("photo"), async (req, res) => {
       staffData.staff_status, staffData.aadhar_number, staffData.pan_number,
       staffData.bank_account_number, staffData.bank_name, staffData.ifsc_code,
       staffData.salary, staffData.highest_qualification, staffData.specialization,
-      staffData.role
+      staffData.role,staffData.joining_date
     ]);
 
     res.status(200).json({
@@ -273,6 +273,7 @@ router.post("/getfilterstaff",async(req,res)=>{
 router.post("/updatestaff", upload.single("photo"), async (req, res) => {
   const db = req.db;
   const staffData = req.body;
+  const uusername=req.tokendata.username;
 
   if (req.fileValidationError) {
     return res.status(400).json({ error: req.fileValidationError });
@@ -291,8 +292,8 @@ router.post("/updatestaff", upload.single("photo"), async (req, res) => {
     "emergency_contact_name", "emergency_contact_number", "designation", "department",
     "role_type", "employment_type", "reporting_manager", "staff_status",
     "aadhar_number", "pan_number", "bank_account_number", "bank_name",
-    "ifsc_code", "salary", "highest_qualification", "specialization", "role"
-  ];
+    "ifsc_code", "salary", "highest_qualification", "specialization", "role","joining_date"
+  ]; 
 
   const missingFields = requiredFields.filter(field => !staffData[field] || staffData[field].toString().trim() === "");
   if (missingFields.length > 0) {
@@ -318,10 +319,11 @@ router.post("/updatestaff", upload.single("photo"), async (req, res) => {
       }
 
       const currentStaff = results[0];
-
+      var oldPhoto=null;
       
       let photoUrl = currentStaff.photo_url;
       if (req.file) {
+        oldPhoto=photoUrl;
         photoUrl = `/uploads/${req.file.filename}`;
       }
 
@@ -333,7 +335,7 @@ router.post("/updatestaff", upload.single("photo"), async (req, res) => {
           city = ?, state = ?, pincode = ?, emergency_contact_name = ?, emergency_contact_number = ?,
           designation = ?, department = ?, role_type = ?, employment_type = ?, reporting_manager = ?,
           staff_status = ?, aadhar_number = ?, pan_number = ?, bank_account_number = ?, bank_name = ?,
-          ifsc_code = ?, salary = ?, highest_qualification = ?, specialization = ?, role = ?
+          ifsc_code = ?, salary = ?, highest_qualification = ?, specialization = ?, role = ?,joining_date= ?,updated_by= ?
         WHERE username = ?
       `;
 
@@ -347,7 +349,7 @@ router.post("/updatestaff", upload.single("photo"), async (req, res) => {
         staffData.staff_status, staffData.aadhar_number, staffData.pan_number,
         staffData.bank_account_number, staffData.bank_name, staffData.ifsc_code,
         staffData.salary, staffData.highest_qualification, staffData.specialization,
-        staffData.role, staffData.username
+        staffData.role, staffData.joining_date,uusername,staffData.username
       ], async (err, result) => {
         if (err) {
           console.error("Database update error:", err);
@@ -376,6 +378,13 @@ router.post("/updatestaff", upload.single("photo"), async (req, res) => {
           });
         }
 
+        if(oldPhoto && oldPhoto !== photoUrl){
+          fs.unlink(path.join(__dirname, "../../", oldPhoto), (err) => {
+              if (err) console.warn("Failed to delete old photo:", err);
+            });
+
+        }
+
         
         db.query("SELECT username FROM users WHERE username = ?", [staffData.username], async (err, userResults) => {
           if (err) {
@@ -384,8 +393,7 @@ router.post("/updatestaff", upload.single("photo"), async (req, res) => {
 
           if (userResults.length === 0) {
             
-            //const dob = staffData.date_of_birth.replace(/-/g, "");
-            //console.log(dob)
+            
             const hashedPassword = await bcrypt.hash(staffData.date_of_birth, 10);
             console.log(staffData.date_of_birth)
             
