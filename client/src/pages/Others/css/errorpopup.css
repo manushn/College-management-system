@@ -4,7 +4,7 @@
     position: absolute;
     margin-right: 50%;
     justify-content: center;
-    width: 80%;
+    width: 100%;
 }
 .emessage-cons{
     background-color: rgb(249, 218, 218);
@@ -22,7 +22,7 @@
     position: absolute;
     margin-right: 50%;
     justify-content: center;
-    width: 80%;
+    width: 100%;
 }
 .message-cons{
     background-color: rgb(149, 255, 149);

@@ -16,7 +16,7 @@ function AdminStaff() {
   
 
 
-  const [Emessage, setEmessage] = useState("");
+  const [Emessage, setEmessage] = useState("Hello");
   const [Message, setMessage] = useState("");
 
    

@@ -39,42 +39,42 @@ router.post("/addstaff", upload.single("photo"), async (req, res) => {
   const db = req.db;
   const staffData = req.body;
 
+  
   if (req.fileValidationError) {
     return res.status(400).json({ error: req.fileValidationError });
   }
 
+  
   const requiredFields = [
     "prefix", "first_name", "last_name", "gender", "date_of_birth",
     "phone_number", "email", "personal_email", "address", "city", "state", "pincode",
     "emergency_contact_name", "emergency_contact_number", "designation", "department",
     "role_type", "employment_type", "reporting_manager", "staff_status",
     "aadhar_number", "pan_number", "bank_account_number", "bank_name",
-    "ifsc_code", "salary", "highest_qualification", "specialization", "joining_date","role"
+    "ifsc_code", "salary", "highest_qualification", "specialization", "joining_date", "role"
   ];
 
+  
   const missingFields = requiredFields.filter(field => !staffData[field] || staffData[field].toString().trim() === "");
   if (missingFields.length > 0) {
     return res.status(203).json({
       success: false,
       emessage: "All fields are required",
+      missingFields: missingFields
     });
   }
 
   try {
+    
+    await db.promise().beginTransaction();
+
+   
     const getYear = new Date().getFullYear();
     const prefix = `NI${getYear}`;
 
-    
     const [results] = await db.promise().query(
-      `
-      SELECT username FROM (
-        SELECT username FROM staff WHERE username LIKE ?
-        UNION
-        SELECT username FROM users WHERE username LIKE ?
-      ) AS combined
-      ORDER BY username DESC LIMIT 1
-      `,
-      [`${prefix}%`, `${prefix}%`]
+      `SELECT username FROM staff WHERE username LIKE ? ORDER BY username DESC LIMIT 1`,
+      [`${prefix}%`]
     );
 
     let nextNumber = 1;
@@ -86,14 +86,16 @@ router.post("/addstaff", upload.single("photo"), async (req, res) => {
     }
 
     const username = `${prefix}${String(nextNumber).padStart(4, "0")}`;
-    
+
     
     const hashedPassword = await bcrypt.hash(staffData.date_of_birth, 10);
 
+    
     const photoUrl = req.file
       ? `/uploads/${req.file.filename}`
       : `/uploads/default-user.png`;
 
+   
     const insertStaffQuery = `
       INSERT INTO staff (
         username, prefix, first_name, last_name, gender, date_of_birth,
@@ -101,17 +103,11 @@ router.post("/addstaff", upload.single("photo"), async (req, res) => {
         emergency_contact_name, emergency_contact_number, designation, department,
         role_type, employment_type, reporting_manager, staff_status, aadhar_number,
         pan_number, bank_account_number, bank_name, ifsc_code, salary,
-        highest_qualification, specialization, role,joining_date
+        highest_qualification, specialization, role, joining_date
       ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     `;
 
    
-    await db.promise().query(
-      `INSERT INTO users (username, password, role) VALUES (?,?,?)`,
-      [username, hashedPassword, staffData.role]
-    );
-
-    
     await db.promise().query(insertStaffQuery, [
       username, staffData.prefix, staffData.first_name, staffData.last_name,
       staffData.gender, staffData.date_of_birth, photoUrl, staffData.phone_number,
@@ -122,16 +118,36 @@ router.post("/addstaff", upload.single("photo"), async (req, res) => {
       staffData.staff_status, staffData.aadhar_number, staffData.pan_number,
       staffData.bank_account_number, staffData.bank_name, staffData.ifsc_code,
       staffData.salary, staffData.highest_qualification, staffData.specialization,
-      staffData.role,staffData.joining_date
+      staffData.role, staffData.joining_date
     ]);
 
-    res.status(200).json({
+    
+    await db.promise().query(
+      `INSERT INTO users (username, password, role) VALUES (?,?,?)`,
+      [username, hashedPassword, staffData.role]
+    );
+
+   
+    await db.promise().commit();
+
+    
+    res.status(201).json({
       success: true,
       message: "Staff added successfully",
-      username
+      username: username
     });
 
   } catch (error) {
+    console.error("Server error while adding staff:", error);
+
+    
+    try {
+      await db.promise().rollback();
+    } catch (rollbackError) {
+      console.error("Error rolling back transaction:", rollbackError);
+    }
+
+    
     if (error.code === "ER_DUP_ENTRY") {
       const match = error.sqlMessage.match(/for key '(?:.*\.)?(\w+)'/);
       let fieldName = match ? match[1] : "Field";
@@ -140,7 +156,8 @@ router.post("/addstaff", upload.single("photo"), async (req, res) => {
         aadhar_number: "Aadhar Number",
         email: "Email",
         phone_number: "Phone Number",
-        pan_number: "PAN Number"
+        pan_number: "PAN Number",
+        username: "Username"
       };
       fieldName = friendlyNames[fieldName] || fieldName.replace(/_/g, " ");
 
@@ -150,10 +167,11 @@ router.post("/addstaff", upload.single("photo"), async (req, res) => {
       });
     }
 
-    console.error("Server error while adding staff:", error);
+    
     res.status(500).json({
-      emessage: "Server error while Adding Staff",
-      error: error.message
+      success: false,
+      emessage: "Server error while adding staff",
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
     });
   }
 });
@@ -186,15 +204,15 @@ router.post("/getstaffusername", async (req, res) => {
     db.query(
       `SELECT username, prefix, first_name, last_name, gender, photo_url, designation, department, staff_status 
        FROM staff 
-       WHERE first_name LIKE ? OR last_name LIKE ?`,
-      [`%${username}%`, `%${username}%`],
+       WHERE first_name LIKE ? OR last_name LIKE ? OR username LIKE ?`,
+      [`%${username}%`, `%${username}%`,`%${username}%`],
       (error, result) => {
         if (error) {
           return res.status(500).json({ emessage: "Database Error", error: error });
         }
 
         if (result.length === 0) {
-          return res.status(203).json({ emessage: "No Staffs" });
+          return res.status(203).json({ message: "No Staffs" });
         }
 
         return res.status(200).json({ Staffdata: result });
@@ -352,7 +370,7 @@ router.post("/updatestaff", upload.single("photo"), async (req, res) => {
         staffData.role, staffData.joining_date,uusername,staffData.username
       ], async (err, result) => {
         if (err) {
-          console.error("Database update error:", err);
+          
 
           if (err.code === "ER_DUP_ENTRY") {
             const match = err.sqlMessage.match(/for key '(?:.*\.)?(\w+)'/);
@@ -404,7 +422,7 @@ router.post("/updatestaff", upload.single("photo"), async (req, res) => {
                   console.error("Error inserting into users:", err);
                   return res.status(500).json({
                     emessage: "Error inserting into users",
-                    error: err.message
+                    
                   });
                 }
 
@@ -419,7 +437,7 @@ router.post("/updatestaff", upload.single("photo"), async (req, res) => {
 
               db.query("UPDATE users SET role= ? where username = ?",[staffData.role,staffData.username],async(err) => {
                 if (err) {
-                  console.error("Error updating into users:", err);
+                  
                   return res.status(500).json({
                     emessage: "Error updating into users",
                     error: err.message

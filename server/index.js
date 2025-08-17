@@ -9,6 +9,7 @@ const path=require("path");
 
 const login =require("./routes/Login");
 const AdminStaff=require("./routes/admin/AdminStaff");
+const Createpassword=require("./routes/Createpassword");
 
 const VerifyToken=require("./middleware/tokenVerify");
 
@@ -20,7 +21,7 @@ const db = mysql.createConnection({
   host: 'localhost',
   user: process.env.DATABASE_USERNAME,
   password: process.env.DATABASE_PASSWORD,
-  database: process.env.DATABASE_NAME
+  database: process.env.DATABASE_NAME,
 });
 
 db.connect(err => {
@@ -34,7 +35,8 @@ app.use((req, res, next) => {
 });
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-app.use("/",login)
+app.use("/",login);
+app.use("/",Createpassword);
 app.use('/admin',VerifyToken,AdminStaff);
 
 app.listen(port||4000,()=>{
