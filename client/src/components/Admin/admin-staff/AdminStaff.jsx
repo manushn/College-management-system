@@ -13,10 +13,7 @@ function AdminStaff() {
 
   const [SearchStaff,setSearchStaff]=useState("");
   const [StaffAdd,setStaffAdd]=useState(false);
-  
-
-
-  const [Emessage, setEmessage] = useState("Hello");
+  const [Emessage, setEmessage] = useState("");
   const [Message, setMessage] = useState("");
 
    

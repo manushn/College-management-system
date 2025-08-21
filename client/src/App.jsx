@@ -1,4 +1,4 @@
-import React from 'react'
+import React ,{useEffect}from 'react'
 import { lazy } from 'react'
 import { BrowserRouter as Router, Routes,Route, Navigate } from 'react-router-dom';
 
@@ -8,7 +8,12 @@ const Loginpage=lazy(()=>import("./pages/Others/Loginpages"));
 const CreatePassword=lazy(()=>import("./pages/Others/CreatePassword"));
 const AdminHome=lazy(()=>import("./pages/admin/AdminHome"));
 
+
+
+
+
 function App() {
+
   return (
     <Router>
       <Routes>
