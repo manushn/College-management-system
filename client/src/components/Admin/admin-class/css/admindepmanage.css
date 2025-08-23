@@ -1,0 +1,78 @@
+.admin-dep-manag-main{
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-dep-main-head{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 5%;
+    padding-left: 1%;
+    border-bottom: 1px solid rgb(232, 231, 231);
+}
+.admin-dep-main-head button{
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    padding: 5px ;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.admin-dep-main-head button:hover{
+    background-color: black;
+    color: white;
+}
+.admin-dep-add-main{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+}
+.admin-dep-add-form{
+    border: 1px solid grey;
+    padding: 10px;
+    margin-top: 20px;
+    border-radius: 10px;
+    width: 250px;
+}
+.admin-dep-add-form h3{
+    text-align: center;
+}
+.admin-dep-add-form-con{
+    display: flex;
+    flex-direction: column;
+}
+.admin-dep-add-form-con label{
+    padding: 10px;
+}
+.admin-dep-add-form-con input{
+    padding: 10px ;
+    border-radius: 5px;
+    border: 1px solid grey;
+    margin-left: 20px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+.admin-adddep-btn{
+    display: flex;
+    justify-content: space-between;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+.admin-adddep-btn button{
+ width: 80px;
+  background: #2c6adb;
+  color: #fff;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.admin-adddep-btn button:hover{
+    background: #184b99;
+}
+

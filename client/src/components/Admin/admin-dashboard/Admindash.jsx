@@ -110,7 +110,7 @@ useEffect(() => {
               <li onClick={() => changetab('accounts')}><img src="adminimg/accounting.png" /><span>Accounts</span></li>
               <li onClick={() => changetab('attendence')}><img src="adminimg/attendance.png" /><span>Attendance</span></li>
               <li onClick={() => changetab('progress')}><img src="adminimg/rising.png" /><span>Progress</span></li>
-              <li onClick={() => changetab('maintainclasses')}><img src="adminimg/calendar.png" /><span>Maintain Classes</span></li>
+              <li onClick={() => changetab('maintainclasses')}><img src="adminimg/calendar.png" /><span>Administration</span></li>
             </ul>
           </div>
         </div>
