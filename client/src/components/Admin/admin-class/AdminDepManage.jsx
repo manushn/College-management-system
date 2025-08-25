@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import "./css/admindepmanage.css";
 import axios from "axios";
 
@@ -12,9 +12,15 @@ function AdminDepManage({setActiveTab,setEmessage,setMessage}) {
   const [depid,setdepid]=useState("");
   const [depname,setdepname]=useState("");
   const [dephod,setdephod]=useState("");
+  const [dephodid,setdephodid]=useState("");
 
   const [namesuggest,setnamesuggest]=useState([])
  
+useState(()=>{
+if(dephod.length<1){
+  setdephodid("");
+}
+},[dephod])
 
 
   const submitDep=async(e)=>{
@@ -22,7 +28,7 @@ function AdminDepManage({setActiveTab,setEmessage,setMessage}) {
     
     try{
 
-        if(!depid||!depname||!dephod){
+        if(!depid||!depname||!dephod||!dephodid){
           setEmessage("Enter All Details In Field!")
           return
         }
@@ -60,6 +66,31 @@ function AdminDepManage({setActiveTab,setEmessage,setMessage}) {
     }
     
   }
+
+  useEffect(() => {
+  const getstaffname = async () => {
+    const Token = localStorage.getItem("Token");
+
+    const response = await axios.get(
+      `${import.meta.env.VITE_BACKEND_URL}/admin/staffnamesug`,
+      {
+        headers: {
+          Authorization: `Bearer ${Token}`,
+          "Content-Type": "application/json",
+        },
+        params: { typedName: dephod },  // <-- pass typedName here
+      }
+    );
+
+    if (response.data.suggestions) {
+      setnamesuggest(response.data.suggestions);
+      console.log(response.data.suggestions);
+    }
+  };
+
+  getstaffname();
+}, [dephod]);
+
 
 
 

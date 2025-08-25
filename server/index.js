@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const mysql = require('mysql2');
 const port=4000;
 const path=require("path");
+const logger = require('./logger');
 
 
 const login =require("./routes/Login");
@@ -35,11 +36,29 @@ app.use((req, res, next) => {
   next();
 });
 
+
+
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/",login);
 app.use("/",Createpassword);
 app.use('/admin',VerifyToken,AdminStaff);
 app.use('/admin',VerifyToken,Administration);
+
+
+app.use((err, req, res, next) => {
+  logger.error({
+    message: err.message,
+    stack: err.stack,
+    route: req.originalUrl,
+    method: req.method,
+    ip: req.ip,
+  });
+
+  res.status(500).json({ error: 'Internal Server Error' });
+});
+
+
 
 app.listen(port||4000,()=>{
     console.log(`Server is running on port ${port}`)

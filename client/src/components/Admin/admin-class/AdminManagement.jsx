@@ -1,14 +1,45 @@
 import React,{useState,useEffect} from 'react'
 import "./css/Adminclasses.css"
+import axios from "axios"
 
-
-function AdminManagement({setActiveTab}) {
+function AdminManagement({setActiveTab,setEmessage,setMessage}) {
 
     const [Departments,setDepartments]=useState([]);
       const [Courses,setCourses]=useState([]);
       const [Timetables,setTimetables]=useState([]);
       const [Events,setEvents]=useState([]);
+
+
+  const fetchdep=async()=>{
+    const Token=localStorage.getItem("Token");
+      try{
+          const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/admin/getdep`,
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if(response.data.emessage){
+        setEmessage(response.data.emessage)
+      }
+      if(response.data.success){
+        setDepartments(response.data.departments)
+      }
+
+      }catch(err){
+        console.log("Error in fetching dep:",err)
+      }
+
+    }     
+
+  
+  useEffect(()=>{
+    fetchdep();
     
+  },[])
 
 
 
@@ -28,18 +59,21 @@ function AdminManagement({setActiveTab}) {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>243</td>
-                  <td>ARTIFICIAL INTELLIGENGE AND DATA SCIENCE</td>
-                  <td>MR BUBY JOSE</td>
-                  
-                </tr>
-                <tr>
-                   <td>13</td>
-                  <td>COMPUTER SCIENCE</td>
-                  <td>MR BUBY JOSE</td>
-                 
-                </tr>
+                {Departments.length === 0 ? (
+                  <tr>
+                    <td colSpan="3" style={{ textAlign: "center" }}>
+                        No departments found.
+                    </td>
+                  </tr>
+                ) : (
+                Departments.map((dep) => (
+                  <tr key={dep.dep_id}>
+                      <td>{dep.dep_id}</td>
+                      <td>{dep.dep_name}</td>
+                      <td>{dep.dep_hod}</td>
+                  </tr>
+                  ))
+                )}
               </tbody>
             </table>
             <button onClick={()=>{setActiveTab('managedepartment')}}>Manage Departments</button>
