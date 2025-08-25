@@ -3,30 +3,42 @@ import "./css/admindepmanage.css";
 import axios from "axios";
 
 
+
 function AdminDepManage({setActiveTab,setEmessage,setMessage}) {
 
   const [Departments,setDepartments]=useState([]);
-  const [ShowAdd,setShowAdd]=useState(true);
+  const [ShowAdd,setShowAdd]=useState(false);
   const [Isloading,setIsloading]=useState(false)
+  const [Isedit,setIsedit]=useState(false)
+  const [deleteConfirm,setdeleteConfirm]=useState(false);
 
   const [depid,setdepid]=useState("");
+  const [predepid,setpredipid]=useState("");
   const [depname,setdepname]=useState("");
   const [dephod,setdephod]=useState("");
   const [dephodid,setdephodid]=useState("");
 
+  const [confirmcheck,setconfirmcheck]=useState("");
+  const [deleteDeptId,setdeleteDeptId]=useState("");
+
+
+
   const [namesuggest,setnamesuggest]=useState([])
+
+
  
-useState(()=>{
-if(dephod.length<1){
-  setdephodid("");
-}
-},[dephod])
+  useState(()=>{
+      if(dephod.length<1){
+          setdephodid("");
+      }
+    },[dephod])
 
-
+//-------------------------------------------------------------------------------
   const submitDep=async(e)=>{
     e.preventDefault();
     
     try{
+      console.log(depid,depname,dephod,dephodid)
 
         if(!depid||!depname||!dephod||!dephodid){
           setEmessage("Enter All Details In Field!")
@@ -40,9 +52,10 @@ if(dephod.length<1){
 
         const Token =localStorage.getItem("Token")
 
-        const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/admin/adddep`,
-        {depid,depname,dephod},
+      if(Isedit){
+        const response = await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/admin/editdep`,
+        {depid,depname,dephod,dephodid,predepid},
         {
           headers: {
             Authorization: `Bearer ${Token}`,
@@ -58,6 +71,27 @@ if(dephod.length<1){
         setMessage(response.data.message)
         setActiveTab(false);
       }
+      }else{
+        const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/admin/adddep`,
+        {depid,depname,dephod,dephodid},
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if(response.data.emessage){
+        setEmessage(response.data.emessage)
+      }
+      if(response.data.success){
+        setMessage(response.data.message)
+        setActiveTab(false);
+      }
+      }
+        
 
     }catch(err){
       console.log("Error in Dep management:",err);
@@ -66,9 +100,15 @@ if(dephod.length<1){
     }
     
   }
-
+//-------------------------------------------------------------------------------
   useEffect(() => {
   const getstaffname = async () => {
+    
+    if(dephod.length<1){
+      setdephodid("");
+      setnamesuggest([]);
+      return
+    }
     const Token = localStorage.getItem("Token");
 
     const response = await axios.get(
@@ -78,19 +118,95 @@ if(dephod.length<1){
           Authorization: `Bearer ${Token}`,
           "Content-Type": "application/json",
         },
-        params: { typedName: dephod },  // <-- pass typedName here
+        params: { typedName: dephod },  
       }
     );
 
     if (response.data.suggestions) {
       setnamesuggest(response.data.suggestions);
-      console.log(response.data.suggestions);
+      
     }
   };
 
   getstaffname();
 }, [dephod]);
 
+//-------------------------------------------------------------------------------
+const fetchdep=async()=>{
+    const Token=localStorage.getItem("Token");
+      try{
+          const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/admin/getdep`,
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if(response.data.emessage){
+        setEmessage(response.data.emessage)
+      }
+      if(response.data.success){
+        setDepartments(response.data.departments)
+      }
+
+      }catch(err){
+        console.log("Error in fetching dep:",err)
+      }
+
+    }     
+
+  
+  useEffect(()=>{
+    fetchdep();
+    
+  },[])
+
+
+//-------------------------------------------------------------------------------
+const handleEdit=(dep)=>{
+  setdepid(dep.dep_id);
+  setpredipid(dep.dep_id);
+  setdepname(dep.dep_name);
+  setdephod(dep.dep_hod);
+  setdephodid(dep.dep_hodid);
+  setIsedit(true);
+  setShowAdd(true)
+
+}
+//-------------------------------------------------------------------------------
+const handleDeleteDepartment = async () => {
+    if (confirmcheck !== "DELETE") {
+      setEmessage("Please type DELETE to confirm.");
+      return;
+    }
+    const Token = localStorage.getItem("Token");
+    setIsloading(true);
+    try {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/admin/deletedep/${deleteDeptId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.data.emessage) setEmessage(response.data.emessage);
+      if (response.data.success) {
+        setMessage(response.data.message);
+        setdeleteConfirm(false);
+        setdeleteDeptId("");
+        setconfirmcheck("");
+      }
+    } catch (err) {
+      setEmessage("Error deleting department.");
+      console.log("Error deleting department:", err);
+    } finally {
+      setIsloading(false);
+    }
+  };
 
 
 
@@ -115,6 +231,7 @@ if(dephod.length<1){
                       type="text" 
                       placeholder='Department ID'
                       value={depid}
+                      disabled={Isedit}
                       onChange={(e)=>{setdepid(e.target.value.toUpperCase())}}
                   />
               </div>
@@ -135,11 +252,18 @@ if(dephod.length<1){
                       type="text" 
                       placeholder='Type for name suggesion'
                       value={dephod}
-                      onChange={(e)=>{setdephod(e.target.value.toUpperCase())}}
+                      onChange={(e)=>{setdephod(e.target.value.toUpperCase());setdephodid("")}}
                   />
               </div>
               <div className="admin-adddep-btn">
-                <button onClick={()=>{setShowAdd(false)}}>Cancel</button>
+                <button onClick={()=>{setShowAdd(false);
+                                      setdephod("");
+                                      setdephodid("");
+                                      setdepname("");
+                                      setdepid("");
+                                      setpredipid("");
+                                      setIsedit(false);
+                                }}>Cancel</button>
                 <button type='submit'>{Isloading?('Adding...'):('Add')}</button>
                 
 
@@ -150,25 +274,84 @@ if(dephod.length<1){
               </form>
               
             </div>
+            {namesuggest.length>0&&(
+
+          <div className="suggesionpopup">
+            {
+              namesuggest.map((user)=>(
+                <p onClick={()=>{setdephod(user.staffname);setdephodid(user.username);setnamesuggest([])}}>{user.staffname}</p>
+              ))
+            }
+            
           </div>
+
+          )}
+
+          </div>
+          
+          
           
           </>
       ):(
           <>
           <div className="admi-dep-table">
-            <table>
+            <div className="adminmanagent-card">
+            <h3>Departments</h3>
+            <table className="card-table">
               <thead>
                 <tr>
-                  <th>DEPARTMRNT ID</th>
-                  <th>DEPARTMENT NAME</th>
-                  <th>DEPARTMENT HOD</th>
-                  <th>ACTION</th>
+                <th>Department Id</th>
+                <th>Department</th>
+                <th>HOD</th>
+                <th>HOD ID</th>
+                <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                <tr></tr>
+                {Departments.length === 0 ? (
+                  <tr>
+                    <td colSpan="3" style={{ textAlign: "center" }}>
+                        No departments found.
+                    </td>
+                  </tr>
+                ) : (
+                Departments.map((dep) => (
+                  <tr key={dep.dep_id}>
+                      <td>{dep.dep_id}</td>
+                      <td>{dep.dep_name}</td>
+                      <td>{dep.dep_hod}</td>
+                      <td>{dep.dep_hodid}</td>
+                      <td>
+                        <button className='dep-edit-btn' onClick={()=>{handleEdit(dep)}}>Edit</button>
+      
+                        <button onClick={()=>{setdeleteConfirm(true)}}>Delete</button>
+                      </td>
+                  </tr>
+                  ))
+                )}
               </tbody>
             </table>
+            <button onClick={()=>{setShowAdd(true)}}>Add Department</button>
+          </div>
+          {
+            deleteConfirm&&(
+              <div className="dep-delete-confirm-main">
+                <div className="dep-delete-confirm">
+                      <p>Type DELETE to delete the department.</p>
+                      <input 
+                          type="text"
+                          onChange={(e)=>{setconfirmcheck(e.target.value.trim())}}
+                          value={confirmcheck}
+                      />
+                <div className="dep-delete-confirm-btn">
+                  <button onClick={()=>{setdeleteConfirm(false);setconfirmcheck("")}}>Cancel</button>
+                  <button onClick={()=>{handleDeleteDepartment()}}>Delete</button>
+                </div>
+                </div>
+                
+              </div>
+            )
+          }
 
           </div>
           </>

@@ -15,7 +15,7 @@ router.post("/adddep", async (req, res,next) => {
 
   try {
     
-    const [existingDeps] = await db.pomise().query(
+    const [existingDeps] = await db.promise().query(
             "SELECT * FROM department WHERE dep_id LIKE ? OR dep_name LIKE ?",
             [`%${depid}%`, `%${depname}%`,`%${dephodid}%`]
         );
@@ -27,8 +27,8 @@ router.post("/adddep", async (req, res,next) => {
 
     
     await db.promise().query(
-      "INSERT INTO department (dep_id, dep_name, dep_hod) VALUES (?, ?, ?)",
-      [depid, depname, dephod]
+      "INSERT INTO department (dep_id, dep_name, dep_hod,dep_hodid ) VALUES (?, ?, ?,?)",
+      [depid, depname, dephod,dephodid]
     );
 
     return res.status(201).json({ message: "Department added successfully" ,success:true});
@@ -38,6 +38,7 @@ router.post("/adddep", async (req, res,next) => {
     return res.status(500).json({ emessage: "Server error"});
   }
 });
+//-------------------------------------------------------------------------------
 
 router.get("/getdep", async (req, res,next) => {
   const db = req.db; 
@@ -80,7 +81,7 @@ router.get("/staffnamesug", async (req, res, next) => {
   }
 });
 
-
+//-------------------------------------------------------------------------------
 
 router.post('/addcourse', async (req, res,next) => {
   const db = req.db;
@@ -129,6 +130,72 @@ router.post('/addcourse', async (req, res,next) => {
     return res.status(500).json({ emessage: 'Server error'});
   }
 });
+//-------------------------------------------------------------------------------
 
+router.delete("/deletedep/:depid", async (req, res, next) => {
+  const db = req.db;
+  const depid = req.params.depid;
 
+  if (!depid) {
+    return res.status(203).json({ emessage: "Department ID is required" });
+  }
+
+  try {
+    
+    const [existing] = await db.promise().query(
+      "SELECT * FROM department WHERE dep_id = ?",
+      [depid]
+    );
+    if (existing.length === 0) {
+      return res.status(203).json({ emessage: "Department not found" });
+    }
+
+   
+    await db.promise().query(
+      "DELETE FROM department WHERE dep_id = ?",
+      [depid]
+    );
+    return res.status(200).json({ message: "Department deleted successfully", success: true });
+  } catch (error) {
+    console.error("Delete dep error:", error);
+    next(error);
+    return res.status(500).json({ emessage: "Server error" });
+  }
+});
+
+//-------------------------------------------------------------------------------
+router.put("/editdep", async (req, res, next) => {
+  const db = req.db;
+  
+  const { depid,depname, dephod, dephodid,predepid } = req.body;
+
+  if (!depname || !dephod || !dephodid||!depid||!predepid) {
+    return res.status(203).json({ emessage: "All fields are required" });
+  }
+
+  try {
+    
+    const [existing] = await db.promise().query(
+      "SELECT * FROM department WHERE dep_id = ?",
+      [predepid]
+    );
+    if (existing.length === 0) {
+      return res.status(203).json({ emessage: "Department not found" });
+    }
+
+    
+    await db.promise().query(
+      "UPDATE department SET dep_name = ?, dep_hod = ?, dep_hodid = ? WHERE dep_id = ?",
+      [depname.trim(), dephod.trim(), dephodid.trim(), predepid]
+    );
+
+    return res.status(200).json({ message: "Department updated successfully", success: true });
+  } catch (error) {
+    console.error("Edit dep error:", error);
+    next(error);
+    return res.status(500).json({ emessage: "Server error" });
+  }
+});
+
+//-------------------------------------------------------------------------------
 module.exports = router;

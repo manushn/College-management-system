@@ -56,6 +56,7 @@ function AdminManagement({setActiveTab,setEmessage,setMessage}) {
                 <th>Department Id</th>
                 <th>Department</th>
                 <th>HOD</th>
+                <th>HOD ID</th>
                 </tr>
               </thead>
               <tbody>
@@ -71,6 +72,7 @@ function AdminManagement({setActiveTab,setEmessage,setMessage}) {
                       <td>{dep.dep_id}</td>
                       <td>{dep.dep_name}</td>
                       <td>{dep.dep_hod}</td>
+                      <td>{dep.dep_hodid}</td>
                   </tr>
                   ))
                 )}
