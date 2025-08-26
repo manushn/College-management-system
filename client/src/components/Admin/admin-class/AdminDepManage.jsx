@@ -146,6 +146,7 @@ const fetchdep=async()=>{
       );
       if(response.data.emessage){
         setEmessage(response.data.emessage)
+        setDepartments([]);
       }
       if(response.data.success){
         setDepartments(response.data.departments)
@@ -162,6 +163,7 @@ const fetchdep=async()=>{
     fetchdep();
     
   },[])
+  
 
 
 //-------------------------------------------------------------------------------
@@ -185,12 +187,15 @@ const handleDeleteDepartment = async () => {
     setIsloading(true);
     try {
       const response = await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/admin/deletedep/${deleteDeptId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/admin/deletedep`,
+        
         {
           headers: {
             Authorization: `Bearer ${Token}`,
             "Content-Type": "application/json",
           },
+          data:{ depid: deleteDeptId },
+          
         }
       );
       if (response.data.emessage) setEmessage(response.data.emessage);
@@ -199,6 +204,7 @@ const handleDeleteDepartment = async () => {
         setdeleteConfirm(false);
         setdeleteDeptId("");
         setconfirmcheck("");
+        fetchdep();
       }
     } catch (err) {
       setEmessage("Error deleting department.");
@@ -310,7 +316,7 @@ const handleDeleteDepartment = async () => {
               <tbody>
                 {Departments.length === 0 ? (
                   <tr>
-                    <td colSpan="3" style={{ textAlign: "center" }}>
+                    <td colSpan="5" style={{ textAlign: "center" }}>
                         No departments found.
                     </td>
                   </tr>
@@ -324,7 +330,7 @@ const handleDeleteDepartment = async () => {
                       <td>
                         <button className='dep-edit-btn' onClick={()=>{handleEdit(dep)}}>Edit</button>
       
-                        <button onClick={()=>{setdeleteConfirm(true)}}>Delete</button>
+                        <button onClick={()=>{setdeleteConfirm(true);setdeleteDeptId(dep.dep_id)}}>Delete</button>
                       </td>
                   </tr>
                   ))
@@ -345,7 +351,9 @@ const handleDeleteDepartment = async () => {
                       />
                 <div className="dep-delete-confirm-btn">
                   <button onClick={()=>{setdeleteConfirm(false);setconfirmcheck("")}}>Cancel</button>
+                  <div className="delete-btn">
                   <button onClick={()=>{handleDeleteDepartment()}}>Delete</button>
+                  </div>
                 </div>
                 </div>
                 

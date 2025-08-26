@@ -46,6 +46,7 @@ useEffect(()=>{
       
       if(response.data.success){
          localStorage.setItem("Token",response.data.Token);
+         sessionStorage.setItem("isLoggedin",true)
         navigate("/admin-home");
       }
 
@@ -80,7 +81,7 @@ useEffect(()=>{
 
         if(response.data.success){
           localStorage.setItem("Token",response.data.token);
-          localStorage.setItem("Role",response.data.role);
+          sessionStorage.setItem("isLoggedin",true)
           navigate("/admin-home");
         }
 

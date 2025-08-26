@@ -112,10 +112,54 @@
     justify-content: center;
     align-items: center;
     width: 100%;
+    top: 0;
+    left: 0;
+    margin-top: 40px;  
     
 }
 
 .dep-delete-confirm{
     width: 250px;
+    background-color: white;
+    padding: 20px;
+    border: 1px solid black;
+    border-radius: 10px;
+    text-align: center;
+}
+.dep-delete-confirm input{
+    padding: 5px;
+    border-radius: 8px;
+    border: 1px solid grey;
+    width: 200px;
+}
+.dep-delete-confirm-btn{
+    display: flex;
+    justify-content: center;
+}
+.dep-delete-confirm-btn button{
+    margin-top: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    background-color: white;
+    border: 1px solid grey;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+
+}
+.dep-delete-confirm-btn button:hover{
+        background-color: black;
+        color: white;
+}
+
+.delete-btn button{
+    color: red;
+    border: 1px solid red;
+    cursor: pointer;
+
+}
+.delete-btn button:hover{
+    background-color: red;
+    color: white;
 }
 

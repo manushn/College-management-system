@@ -3,15 +3,21 @@ import { useNavigate } from 'react-router-dom';
 
 function Protectedroutes({ children }) {
   const navigate = useNavigate();
-  const isLoggedin = localStorage.getItem('Token');
+  const isLoggedin = sessionStorage.getItem("isLoggedin")
+  const isToken=localStorage.getItem('Token');
   
   
 
   useEffect(() => {
     if(!isLoggedin){
-    navigate('/login'); 
-    return null;
+      
+        navigate('/login'); 
+        return ; 
   }
+   if(!isToken){
+      navigate("/login");
+      return;
+   }
     
   }, [isLoggedin, navigate]);
 

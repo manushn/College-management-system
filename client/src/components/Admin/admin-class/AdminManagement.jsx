@@ -62,7 +62,7 @@ function AdminManagement({setActiveTab,setEmessage,setMessage}) {
               <tbody>
                 {Departments.length === 0 ? (
                   <tr>
-                    <td colSpan="3" style={{ textAlign: "center" }}>
+                    <td colSpan="4" style={{ textAlign: "center" }}>
                         No departments found.
                     </td>
                   </tr>

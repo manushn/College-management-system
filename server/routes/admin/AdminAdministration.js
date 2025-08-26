@@ -132,9 +132,10 @@ router.post('/addcourse', async (req, res,next) => {
 });
 //-------------------------------------------------------------------------------
 
-router.delete("/deletedep/:depid", async (req, res, next) => {
+router.delete("/deletedep", async (req, res, next) => {
   const db = req.db;
-  const depid = req.params.depid;
+  const depid = req.body.depid;
+  console.log(depid)
 
   if (!depid) {
     return res.status(203).json({ emessage: "Department ID is required" });
@@ -198,4 +199,7 @@ router.put("/editdep", async (req, res, next) => {
 });
 
 //-------------------------------------------------------------------------------
+
+
+
 module.exports = router;
