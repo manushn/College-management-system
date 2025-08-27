@@ -283,29 +283,55 @@ router.post("/addcourse", async (req, res, next) => {
     Regulation,
   } = req.body;
 
-  if(!courseCode||!CourseName||!CourseType||!Credit||!Depid||!Department||!StaffId||!Staffname||!Sem||!Regulation){
-    return res.status(203).json({emessage:"All Fields are required"})
+  console.log("courseData =>", {
+    courseCode,
+    CourseName,
+    CourseType,
+    Credit,
+    Depid,
+    Department,
+    StaffId,
+    Staffname,
+    Sem,
+    Regulation,
+  });
+
+  
+  if (
+    !courseCode?.trim() ||
+    !CourseName?.trim() ||
+    !CourseType?.trim() ||
+    !Credit ||
+    !Depid ||
+    !Department?.trim() ||
+    !StaffId?.trim() ||
+    !Staffname?.trim() ||
+    !Sem ||
+    !Regulation
+  ) {
+    return res
+      .status(400) 
+      .json({ emessage: "All fields are required" });
   }
+
   try {
-    const [result] = await db
-      .promise()
-      .query(
-        `INSERT INTO courses 
+    const [result] = await db.promise().query(
+      `INSERT INTO courses 
         (course_code, course_name, course_type, credit, dep_id, dep_name, staff_id, staff_name, sem, regulation) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          courseCode,
-          CourseName,
-          CourseType,
-          Credit,
-          Depid,
-          Department,
-          StaffId,
-          Staffname,
-          Sem,
-          Regulation,
-        ]
-      );
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        courseCode.trim(),
+        CourseName.trim(),
+        CourseType.trim(),
+        Number(Credit),   
+        Number(Depid),   
+        Department.trim(),
+        StaffId.trim(),
+        Staffname.trim(),
+        Number(Sem),
+        Number(Regulation),
+      ]
+    );
 
     return res.status(201).json({
       success: true,
@@ -313,8 +339,7 @@ router.post("/addcourse", async (req, res, next) => {
       courseId: result.insertId,
     });
   } catch (error) {
-    console.error("Error in addcourse:", error);
-    next(error);
+    console.error("Error in /addcourse:", error.message);
     return res.status(500).json({ emessage: "Server Error" });
   }
 });
