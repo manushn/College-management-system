@@ -199,7 +199,125 @@ router.put("/editdep", async (req, res, next) => {
 });
 
 //-------------------------------------------------------------------------------
+//Course route
+//-------------------------------------------------------------------------------
+
+router.post("/addcourse",async(req,res,next)=>{
+  const db=req.db;
+
+  let(coursecode,coursename,coursetype,credit,dep_id,staffname,staffid,sem,regulation)=req.body;
+
+  if(!coursecode||!coursename||!coursetype||!credit||!dep_id||!staffname||!sem||!regulation){
+    return res.status(203).json({emessage:"All fields are required"})
+  }
+  coursecode=coursecode.trim();
+  coursename=coursename.trim();
+  coursetype=coursetype.trim();
+  staffname=staffname.trim();
+  credit=number(credit.trim());
+  sem=number(sem.trim());
+  regulation=number(regulation.trim());
+
+try{
+  const [departments]=await db.promise().query(
+    "SELECT * FROM department WHERE dep_id LIKE ?",
+    [`%${dep_id}%`]
+  );
+  if(departments.length<1){
+    return res.status(203).json({emessage:"Department not found"})
+  } 
+
+  const [existingCourses]=await db.promise().query(
+    "SELECT * FROM courses WHERE course_code = ? AND dep_id = ? AND sem = ? AND regulation = ?",
+    [coursecode,dep_id,sem,regulation]
+  );
+  if(existingCourses.length>0){
+    return res.status(203).json({emessage:"Course already exists for this department,semester and regulation"})
+  } 
+  await db.promise().query(
+    `INSERT INTO courses
+     (course_code, course_name, course_type, credit, dep_id, staff_name, staff_id, sem, regulation)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [coursecode,coursename,coursetype,credit,dep_id,staffname,staffid,sem,regulation]
+  );
+  return res.status(201).json({message:"Course added successfully",success:true});
+
+}catch(error){
+  console.error("Add course error:",error);
+  next(error);
+  return res.status(500).json({emessage:"Server error"});
+}
+
+})
 
 
+//-------------------------------------------------------------------------------
 
+router.get("/getcourses",async(req,res,next)=>{
+  const db=req.db;
+  try{
+    const [Courses]=await db.promise().query(`SELECT * FROM courses`)
+    return res.status(200).json({success:true,courses:Courses||[]})
+
+  }catch(error){
+    console.log("Error in Getcourses",error);
+    next(error);
+    return res.status(500).json({emessage:"Server Error"})
+
+  }
+})
+//-------------------------------------------------------------------------------
+
+router.post("/addcourse", async (req, res, next) => {
+  const db = req.db;
+  const {
+    courseCode,
+    CourseName,
+    CourseType,
+    Credit,
+    Depid,
+    Department,
+    StaffId,
+    Staffname,
+    Sem,
+    Regulation,
+  } = req.body;
+
+  if(!courseCode||!CourseName||!CourseType||!Credit||!Depid||!Department||!StaffId||!Staffname||!Sem||!Regulation){
+    return res.status(203).json({emessage:"All Fields are required"})
+  }
+  try {
+    const [result] = await db
+      .promise()
+      .query(
+        `INSERT INTO courses 
+        (course_code, course_name, course_type, credit, dep_id, dep_name, staff_id, staff_name, sem, regulation) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          courseCode,
+          CourseName,
+          CourseType,
+          Credit,
+          Depid,
+          Department,
+          StaffId,
+          Staffname,
+          Sem,
+          Regulation,
+        ]
+      );
+
+    return res.status(201).json({
+      success: true,
+      message: "Course added successfully!",
+      courseId: result.insertId,
+    });
+  } catch (error) {
+    console.error("Error in addcourse:", error);
+    next(error);
+    return res.status(500).json({ emessage: "Server Error" });
+  }
+});
+
+//-------------------------------------------------------------------------------
 module.exports = router;

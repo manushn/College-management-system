@@ -38,7 +38,7 @@ function AdminDepManage({setActiveTab,setEmessage,setMessage}) {
     e.preventDefault();
     
     try{
-      console.log(depid,depname,dephod,dephodid)
+      
 
         if(!depid||!depname||!dephod||!dephodid){
           setEmessage("Enter All Details In Field!")
@@ -241,6 +241,15 @@ const handleDeleteDepartment = async () => {
                       onChange={(e)=>{setdepid(e.target.value.toUpperCase())}}
                   />
               </div>
+              <div className="admin-dep-add-form-con">
+                  <label>Department HOD Name</label>
+                  <input 
+                      type="text" 
+                      placeholder='Type for name suggesion'
+                      value={dephod}
+                      onChange={(e)=>{setdephod(e.target.value.toUpperCase());setdephodid("")}}
+                  />
+              </div>
 
               <div className="admin-dep-add-form-con">
                   <label>Department Name</label>
@@ -252,16 +261,9 @@ const handleDeleteDepartment = async () => {
                   />
               </div>
 
-              <div className="admin-dep-add-form-con">
-                  <label>Department HOD Name</label>
-                  <input 
-                      type="text" 
-                      placeholder='Type for name suggesion'
-                      value={dephod}
-                      onChange={(e)=>{setdephod(e.target.value.toUpperCase());setdephodid("")}}
-                  />
-              </div>
+              
               <div className="admin-adddep-btn">
+                <button type='submit'>{Isloading?('Adding...'):('Add')}</button>
                 <button onClick={()=>{setShowAdd(false);
                                       setdephod("");
                                       setdephodid("");
@@ -270,7 +272,6 @@ const handleDeleteDepartment = async () => {
                                       setpredipid("");
                                       setIsedit(false);
                                 }}>Cancel</button>
-                <button type='submit'>{Isloading?('Adding...'):('Add')}</button>
                 
 
               </div>

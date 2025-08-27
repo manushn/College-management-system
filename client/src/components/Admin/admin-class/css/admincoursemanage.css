@@ -1,0 +1,122 @@
+.admin-course-main{
+    display:flex;
+    flex-direction: column;
+    
+}
+.admin-course-head{
+    display: flex;
+    justify-content: space-between;
+    margin-left: 10px;
+    margin-right: 10%;
+    align-items: center;
+}
+.admin-course-head button{
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    padding: 5px;
+    border-radius: 5px;
+}
+.admin-course-body {
+  margin-left: 1%;
+  height: 75vh;
+  overflow-y: auto;
+}
+
+.admin-course-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-course-add-form {
+  border: 1px solid grey;
+  padding: 20px;
+  max-width: 800px; 
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-course-add-form h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.admin-course-add-form form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; 
+}
+
+.course-sub {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 calc(50% - 20px); 
+  min-width: 250px; 
+}
+
+.course-sub label {
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.course-sub input,
+.course-sub select {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.admin-adddep-btn {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.admin-adddep-btn button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #4caf50;
+  color: white;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.admin-adddep-btn button:last-child {
+  background: #f44336;
+}
+
+.admin-adddep-btn button:hover {
+  opacity: 0.9;
+}
+
+.card-filter-header{
+    display: flex;
+    align-items: center;
+}
+
+.card-filter-con{
+    display: flex;
+}
+.card-filter-con-sub{
+    margin-left: 10px;
+}
+.card-filter-con-sub select{
+    width: 100px;
+    padding: 5px;
+
+}
+.admin-card-head{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    justify-content: space-between;
+    margin-right: 5%;
+}
+.admin-card-head input{
+    padding: 5px;
+}

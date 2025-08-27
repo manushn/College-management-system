@@ -39,9 +39,7 @@ function AdminClasses() {
       return () => window.removeEventListener("popstate", handleBack);
     }, []);
 
-    useEffect(()=>{
-        console.log(activeTab)
-    },[activeTab])
+    
   
     const rendercon= ()=>{
       switch(activeTab){
