@@ -395,6 +395,7 @@ function AdminCourseManage({ setActiveTab, setEmessage, setMessage }) {
                     <th>Department</th>
                     <th>Semester</th>
                     <th>From Regulation</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>

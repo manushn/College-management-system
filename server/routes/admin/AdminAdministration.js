@@ -81,61 +81,13 @@ router.get("/staffnamesug", async (req, res, next) => {
   }
 });
 
-//-------------------------------------------------------------------------------
 
-router.post('/addcourse', async (req, res,next) => {
-  const db = req.db;
-  let {
-    course_code,
-    course_name,
-    course_type,
-    credit,
-    dep_id,
-    sem
-  } = req.body;
-
-  
-  if (!course_code || !course_name || !course_type || !credit || !dep_id || !sem) {
-    return res.status(203).json({ emessage: 'All fields are required' });
-  }
-
-  
-  course_code = course_code.trim();
-  course_name = course_name.trim();
-  course_type = course_type.trim();
-
-  try {
-    
-    const [existingCourses] = await db.promise().query(
-      'SELECT * FROM courses WHERE course_code = ? AND dep_id = ? AND sem = ? AND course_name = ?',
-      [course_code, dep_id, sem,course_name]
-    );
-
-    if (existingCourses.length > 0) {
-      return res.status(203).json({ emessage: 'Course already exists for this department and semester' });
-    }
-
-    
-    await db.promise().query(
-      `INSERT INTO courses
-       (course_code, course_name, course_type, credit, dep_id, sem)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [course_code, course_name, course_type, credit, dep_id, sem]
-    );
-
-    return res.status(201).json({ message: 'Course added successfully', success: true });
-  } catch (error) {
-    console.error('Add course error:', error);
-    next(err);
-    return res.status(500).json({ emessage: 'Server error'});
-  }
-});
 //-------------------------------------------------------------------------------
 
 router.delete("/deletedep", async (req, res, next) => {
   const db = req.db;
   const depid = req.body.depid;
-  console.log(depid)
+  
 
   if (!depid) {
     return res.status(203).json({ emessage: "Department ID is required" });
@@ -200,60 +152,9 @@ router.put("/editdep", async (req, res, next) => {
 
 //-------------------------------------------------------------------------------
 //Course route
-//-------------------------------------------------------------------------------
-
-router.post("/addcourse",async(req,res,next)=>{
-  const db=req.db;
-
-  let(coursecode,coursename,coursetype,credit,dep_id,staffname,staffid,sem,regulation)=req.body;
-
-  if(!coursecode||!coursename||!coursetype||!credit||!dep_id||!staffname||!sem||!regulation){
-    return res.status(203).json({emessage:"All fields are required"})
-  }
-  coursecode=coursecode.trim();
-  coursename=coursename.trim();
-  coursetype=coursetype.trim();
-  staffname=staffname.trim();
-  credit=number(credit.trim());
-  sem=number(sem.trim());
-  regulation=number(regulation.trim());
-
-try{
-  const [departments]=await db.promise().query(
-    "SELECT * FROM department WHERE dep_id LIKE ?",
-    [`%${dep_id}%`]
-  );
-  if(departments.length<1){
-    return res.status(203).json({emessage:"Department not found"})
-  } 
-
-  const [existingCourses]=await db.promise().query(
-    "SELECT * FROM courses WHERE course_code = ? AND dep_id = ? AND sem = ? AND regulation = ?",
-    [coursecode,dep_id,sem,regulation]
-  );
-  if(existingCourses.length>0){
-    return res.status(203).json({emessage:"Course already exists for this department,semester and regulation"})
-  } 
-  await db.promise().query(
-    `INSERT INTO courses
-     (course_code, course_name, course_type, credit, dep_id, staff_name, staff_id, sem, regulation)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [coursecode,coursename,coursetype,credit,dep_id,staffname,staffid,sem,regulation]
-  );
-  return res.status(201).json({message:"Course added successfully",success:true});
-
-}catch(error){
-  console.error("Add course error:",error);
-  next(error);
-  return res.status(500).json({emessage:"Server error"});
-}
-
-})
-
-
-//-------------------------------------------------------------------------------
 
 router.get("/getcourses",async(req,res,next)=>{
+  console.log("Route Hitted")
   const db=req.db;
   try{
     const [Courses]=await db.promise().query(`SELECT * FROM courses`)
@@ -269,6 +170,7 @@ router.get("/getcourses",async(req,res,next)=>{
 //-------------------------------------------------------------------------------
 
 router.post("/addcourse", async (req, res, next) => {
+  
   const db = req.db;
   const {
     courseCode,
