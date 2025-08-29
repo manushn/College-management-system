@@ -383,6 +383,10 @@ function AdminCourseManage({ setActiveTab, setEmessage, setMessage }) {
                   </div>
                 </div>
               </div>
+              <div className="card-head-details">
+                  <p><b>Department:</b> {courses.length > 0 ? courses[0].dep_name : "No department available"}</p> 
+                  <p><b>Semester:</b>{courses.length > 0 ? courses[0].sem : "No Semester available"} </p>                 
+              </div>
 
               <table className="card-table">
                 <thead>

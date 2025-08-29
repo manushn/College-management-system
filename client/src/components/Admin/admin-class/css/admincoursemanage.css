@@ -134,3 +134,9 @@ input[type=number] {
 .admin-card-head input{
     padding: 5px;
 }
+.card-head-details{
+  display: flex;
+}
+.card-head-details p{
+  padding-right:5%;
+}

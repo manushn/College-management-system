@@ -5,9 +5,13 @@ import axios from "axios"
 function AdminManagement({setActiveTab,setEmessage,setMessage}) {
 
     const [Departments,setDepartments]=useState([]);
-      const [Courses,setCourses]=useState([]);
+      const [courses,setcourses]=useState([]);
       const [Timetables,setTimetables]=useState([]);
       const [Events,setEvents]=useState([]);
+
+      const [Deploading,setDeploading]=useState(true);
+      const [CourseLoading,setCourseloading]=useState(true);
+        
 
 
   const fetchdep=async()=>{
@@ -31,15 +35,47 @@ function AdminManagement({setActiveTab,setEmessage,setMessage}) {
 
       }catch(err){
         console.log("Error in fetching dep:",err)
-      }
+      }finally{setDeploading(false)}
 
     }     
+  
+  const fetchcourses = async () => {
+    const Token = localStorage.getItem("Token");
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/admin/getcourses`,
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.data.emessage) {
+        setEmessage(response.data.emessage);
+        setcourses([]);
+      }
+      if (response.data.success) {
+        setcourses(response.data.courses);
+      }
+    } catch (err) {
+      console.log("Error in fetching courses:", err);
+    }finally{setCourseloading(false)}
+  };
+
+  
+
+  useEffect(() => {
+    fetchcourses();
+  }, []);
 
   
   useEffect(()=>{
     fetchdep();
     
   },[])
+
+
 
 
 
@@ -63,7 +99,7 @@ function AdminManagement({setActiveTab,setEmessage,setMessage}) {
                 {Departments.length === 0 ? (
                   <tr>
                     <td colSpan="4" style={{ textAlign: "center" }}>
-                        No departments found.
+                       {Deploading ? "Loading Departments..." : "No Department found!"}
                     </td>
                   </tr>
                 ) : (
@@ -82,27 +118,59 @@ function AdminManagement({setActiveTab,setEmessage,setMessage}) {
           </div>
           <div className="adminmanagent-card">
             <h3>Courses</h3>
+             <div className="card-head-details">
+                  <p><b>Department:</b> {courses.length > 0 ? courses[0].dep_name : "No department available"}</p> 
+                  <p><b>Semester:</b>{courses.length > 0 ? courses[0].sem : "No Semester available"} </p>                 
+              </div>
             <table className="card-table">
-              <thead>
-                <tr>
-                <th>COURSE ID</th>
-                <th>COURSE</th>
-                <th>SEMESTER</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>MA3354</td>
-                  <td>Discrete Mathematics </td>
-                  <td>5</td>
-                </tr>
-                <tr>
-                  <td>CS3351</td>
-                  <td>Digital Principles and Computer Organization </td>
-                  <td>5</td>
-                </tr>
-              </tbody>
-            </table>
+                <thead>
+                  <tr>
+                    <th>Course Code</th>
+                    <th>Course Name</th>
+                    <th>Course Type</th>
+                    <th>Credit</th>
+                    <th>Lecturer</th>
+                    <th>Department</th>
+                    <th>Semester</th>
+                    <th>From Regulation</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {courses.length === 0 ? (
+                    <tr>
+                      <td colSpan="9" style={{ textAlign: "center" }}>
+                        {CourseLoading ? "Loading courses..." : "No courses found!"}
+                      </td>
+                    </tr>
+                  ) : (
+                    courses.map((cour) => (
+                      <tr key={cour.course_id}>
+                        <td>{cour.course_code}</td>
+                        <td>{cour.course_name}</td>
+                        <td>{cour.course_type}</td>
+                        <td>{cour.credit}</td>
+                        <td>{cour.staff_name}</td>
+                        <td>{cour.dep_name}</td>
+                        <td>{cour.sem}</td>
+                        <td>{cour.regulation}</td>
+                        <td>
+                          <button
+                            className="dep-edit-btn"
+                            onClick={() => {
+                              setIsedit(true);
+                              setIsAdd(true);
+                              
+                            }}
+                          >
+                            Edit
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             <button onClick={()=>{setActiveTab('managecourses')}}>Manage courses</button>
           </div>
           <div className="adminmanagent-tablecard">

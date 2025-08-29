@@ -153,20 +153,48 @@ router.put("/editdep", async (req, res, next) => {
 //-------------------------------------------------------------------------------
 //Course route
 
-router.get("/getcourses",async(req,res,next)=>{
-  console.log("Route Hitted")
-  const db=req.db;
-  try{
-    const [Courses]=await db.promise().query(`SELECT * FROM courses`)
-    return res.status(200).json({success:true,courses:Courses||[]})
+router.get("/getcourses", async (req, res, next) => {
+  const db = req.db;
 
-  }catch(error){
-    console.log("Error in Getcourses",error);
+  try {
+    
+    const [firstCourse] = await db
+      .promise()
+      .query(
+        `SELECT * FROM courses WHERE sem = ? ORDER BY course_id ASC LIMIT 1`,
+        [1]
+      );
+
+    if (firstCourse.length === 0) {
+      return res.status(203).json({ 
+        success: true,
+        courses: Courses || [],
+    });
+    }
+
+    const department = firstCourse[0].dep_name;
+
+    
+    const [Courses] = await db
+      .promise()
+      .query(
+        `SELECT * FROM courses WHERE sem = ? AND dep_name = ?`,
+        [1, department]
+      );
+
+    return res.status(200).json({
+      success: true,
+      courses: Courses || [],
+    });
+
+  } catch (error) {
+    console.log("Error in Getcourses", error);
     next(error);
-    return res.status(500).json({emessage:"Server Error"})
-
+    return res.status(500).json({ emessage: "Server Error" });
   }
-})
+});
+
+
 //-------------------------------------------------------------------------------
 
 router.post("/addcourse", async (req, res, next) => {
@@ -247,4 +275,39 @@ router.post("/addcourse", async (req, res, next) => {
 });
 
 //-------------------------------------------------------------------------------
+
+router.get("/courses/filter", async (req, res, next) => {
+  const db = req.db;
+  const { department, sem } = req.body;
+
+  try {
+    let query = "SELECT * FROM courses WHERE 1=1";
+    let params = [];
+
+    if (department) {
+      query += " AND dep_name LIKE ?";
+      params.push(`%${department}%`);
+    }
+
+    if (sem) {
+      query += " AND sem = ?";
+      params.push(Number(sem));
+    }
+
+    const [courses] = await db.promise().query(query, params);
+
+    if (courses.length < 1) {
+      return res.status(203).json({ emessage: "No courses found" });
+    }
+
+    return res.status(200).json({ success: true, courses });
+  } catch (error) {
+    console.error("Error in /courses/filter:", error);
+    next(error);
+    return res.status(500).json({ emessage: "Server error" });
+  }
+});
+
+
+
 module.exports = router;
