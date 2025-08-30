@@ -115,9 +115,25 @@ input[type=number] {
 
 .card-filter-con{
     display: flex;
+    align-items: center;
+    
 }
 .card-filter-con-sub{
     margin-left: 10px;
+    display: flex;
+    align-items: center;
+    
+}
+.card-filter-con-sub button{
+  margin-bottom: 10px;
+  background-color: white;
+  color: black;
+  border: 1px solid black;
+  padding: 6px;
+}
+.card-filter-con-sub button:hover{
+  background-color: black;
+  color: white;
 }
 .card-filter-con-sub select{
     width: 100px;
@@ -133,6 +149,11 @@ input[type=number] {
 }
 .admin-card-head input{
     padding: 5px;
+    border-radius: 5px;
+    border: 1px solid grey;
+}
+.admin-card-head input:focus{
+  outline: none;
 }
 .card-head-details{
   display: flex;

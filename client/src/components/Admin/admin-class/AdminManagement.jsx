@@ -133,7 +133,7 @@ function AdminManagement({setActiveTab,setEmessage,setMessage}) {
                     <th>Department</th>
                     <th>Semester</th>
                     <th>From Regulation</th>
-                    <th>Action</th>
+                    
                   </tr>
                 </thead>
                 <tbody>
@@ -154,18 +154,7 @@ function AdminManagement({setActiveTab,setEmessage,setMessage}) {
                         <td>{cour.dep_name}</td>
                         <td>{cour.sem}</td>
                         <td>{cour.regulation}</td>
-                        <td>
-                          <button
-                            className="dep-edit-btn"
-                            onClick={() => {
-                              setIsedit(true);
-                              setIsAdd(true);
-                              
-                            }}
-                          >
-                            Edit
-                          </button>
-                        </td>
+                        
                       </tr>
                     ))
                   )}

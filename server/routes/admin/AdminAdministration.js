@@ -213,18 +213,7 @@ router.post("/addcourse", async (req, res, next) => {
     Regulation,
   } = req.body;
 
-  console.log("courseData =>", {
-    courseCode,
-    CourseName,
-    CourseType,
-    Credit,
-    Depid,
-    Department,
-    StaffId,
-    Staffname,
-    Sem,
-    Regulation,
-  });
+  
 
   
   if (
@@ -295,6 +284,7 @@ router.get("/courses/filter", async (req, res, next) => {
     }
 
     const [courses] = await db.promise().query(query, params);
+   
 
     if (courses.length < 1) {
       return res.status(203).json({ emessage: "No courses found" });
@@ -309,5 +299,97 @@ router.get("/courses/filter", async (req, res, next) => {
 });
 
 
+router.get("/courses/search", async (req, res, next) => {
+  const db = req.db;
+  const { keyword } = req.query;
+
+  if (!keyword || keyword.trim() === "") {
+    return res.status(400).json({ emessage: "Keyword is required" });
+  }
+
+  try {
+    const [courses] = await db.promise().query(
+      `SELECT * FROM courses 
+       WHERE course_name LIKE ? OR course_code LIKE ?`,
+      [`%${keyword}%`, `%${keyword}%`]
+    );
+
+    if (courses.length < 1) {
+      return res.status(203).json({ emessage: "No matching courses found" });
+    }
+
+    return res.status(200).json({ success: true, courses });
+  } catch (error) {
+    console.error("Error in /courses/search:", error);
+    next(error);
+    return res.status(500).json({ emessage: "Server error" });
+  }
+});
+
+
+router.put("/updatecourse/:id", async (req, res, next) => {
+  const db = req.db;
+  const { id } = req.params;
+
+  const {
+    courseCode,
+    CourseName,
+    CourseType,
+    Credit,
+    Depid,
+    Department,
+    StaffId,
+    Staffname,
+    Sem,
+    Regulation,
+  } = req.body;
+
+  if (
+    !courseCode ||
+    !CourseName ||
+    !CourseType ||
+    !Credit ||
+    !Depid ||
+    !Department ||
+    !StaffId ||
+    !Staffname ||
+    !Sem ||
+    !Regulation
+  ) {
+    return res.status(400).json({ emessage: "All fields are required" });
+  }
+
+  try {
+    const [result] = await db.promise().query(
+      `UPDATE courses
+       SET course_code = ?, course_name = ?, course_type = ?, credit = ?, dep_id = ?, dep_name = ?, 
+           staff_id = ?, staff_name = ?, sem = ?, regulation = ?
+       WHERE course_id = ?`,
+      [
+        courseCode,
+        CourseName,
+        CourseType,
+        Credit,
+        Depid,
+        Department,
+        StaffId,
+        Staffname,
+        Sem,
+        Regulation,
+        id,
+      ]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ emessage: "Course not found" });
+    }
+
+    return res.status(200).json({ success: true, message: "Course updated successfully" });
+  } catch (error) {
+    console.error("Error in /updatecourse:", error);
+    next(error);
+    return res.status(500).json({ emessage: "Server error" });
+  }
+});
 
 module.exports = router;

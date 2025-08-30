@@ -12,6 +12,7 @@ function AdminCourseManage({ setActiveTab, setEmessage, setMessage }) {
   const [namesuggest, setnamesuggest] = useState([]);
   const [courses, setcourses] = useState([]);
 
+  const [courseId,setcourseId]=useState("");
   const [courseCode, setCourseCode] = useState("");
   const [CourseName, setCourseName] = useState("");
   const [CourseType, setCourseType] = useState("Regular");
@@ -160,6 +161,8 @@ function AdminCourseManage({ setActiveTab, setEmessage, setMessage }) {
 
   const fetchcourses = async () => {
     const Token = localStorage.getItem("Token");
+    setfilterDep("");
+    setfilterSem("");
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/admin/getcourses`,
@@ -220,6 +223,109 @@ function AdminCourseManage({ setActiveTab, setEmessage, setMessage }) {
 
   };
 
+  useEffect(() => {
+  // if search is cleared, reload all courses
+  if (!filterchar.trim()) {
+    fetchcourses();
+    return;
+  }
+
+  
+  const handler = setTimeout(() => {
+    const runSearch = async () => {
+      try {
+        const Token = localStorage.getItem("Token");
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/admin/courses/search`,
+          {
+            headers: {
+              Authorization: `Bearer ${Token}`,
+              "Content-Type": "application/json",
+            },
+            params: { keyword: filterchar }, 
+          }
+        );
+
+        if (response.data.success) {
+          setcourses(response.data.courses);
+        } else if (response.data.emessage) {
+          setEmessage(response.data.emessage);
+          setcourses([]);
+        }
+      } catch (err) {
+        console.log("Error in searching courses:", err);
+        setEmessage("Error fetching search results!");
+      }
+    };
+
+    runSearch();
+  }, 500); 
+  return () => clearTimeout(handler); 
+}, [filterchar]);
+
+const handleUpdate = async (e) => {
+  e.preventDefault();
+  if (
+    !courseId||
+    !courseCode ||
+    !CourseName ||
+    !CourseType ||
+    !Credit ||
+    !Department ||
+    !Depid ||
+    !Staffname ||
+    !StaffId ||
+    !Sem ||
+    !Regulation
+  ) {
+    setEmessage("Enter all Fields!");
+    return;
+  }
+
+  try {
+    setIsloading(true);
+    const Token = localStorage.getItem("Token");
+
+    const response = await axios.put(
+      `${import.meta.env.VITE_BACKEND_URL}/admin/updatecourse/${courseId}`, // courseId must come from selected course
+      {
+        courseCode,
+        CourseName,
+        CourseType,
+        Credit,
+        Depid,
+        Department,
+        Staffname,
+        StaffId,
+        Sem,
+        Regulation,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${Token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response.data.success) {
+      setMessage("Course updated successfully!");
+      clearForm();
+      setIsAdd(false);
+      setIsedit(false);
+      fetchcourses(); 
+    } else if (response.data.emessage) {
+      setEmessage(response.data.emessage);
+    }
+  } catch (err) {
+    console.log("Error in updating course:", err);
+    setEmessage("Error updating course!");
+  } finally {
+    setIsloading(false);
+  }
+};
+
+
   useEffect(()=>{
     if(filterDep){
 
@@ -261,8 +367,22 @@ useEffect(()=>{
     setStaffname("");
     setSem("");
     setRegulation("");
+    setcourseId("");
   };
 
+  const Seteditform=(c)=>{
+    setCourseCode(c.course_code);
+    setCourseName(c.course_name);
+    setCourseType(c.course_type);
+    setCredit(c.credit);
+    setDepId(c.dep_id);
+    setDepartment(c.dep_name);
+    setStaffId(c.staff_id);
+    setStaffname(c.staff_name);
+    setSem(c.sem);
+    setRegulation(c.regulation);
+    setcourseId(c.course_id)
+  }
   //--------------------------------------------------------------------------------------
 
   return (
@@ -276,7 +396,7 @@ useEffect(()=>{
           <div className="admin-course-add">
             <div className="admin-course-add-form">
               <h2>Add Course</h2>
-              <form onSubmit={handleAdding}>
+              <form onSubmit={Isedit ? handleUpdate : handleAdding}>
                 <div className="course-sub">
                   <label>Course Code</label>
                   <input
@@ -358,8 +478,9 @@ useEffect(()=>{
                 </div>
                 <div className="admin-adddep-btn">
                   <button type="submit">
-                    {Isloading ? "Adding..." : "Add"}
+                        {Isloading ? (Isedit ? "Updating..." : "Adding...") : Isedit ? "Update" : "Add"}
                   </button>
+
                   <button
                     type="button"
                     onClick={() => {
@@ -434,6 +555,9 @@ useEffect(()=>{
                         ))}
                       </select>
                     </div>
+                    <div className="card-filter-con-sub">
+                    <button onClick={()=>{setfilterDep("");setfilterSem("")}}>Clear</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -459,7 +583,7 @@ useEffect(()=>{
                 <tbody>
                   {courses.length === 0 ? (
                     <tr>
-                      <td colSpan="8" style={{ textAlign: "center" }}>
+                      <td colSpan="9" style={{ textAlign: "center" }}>
                         {Isloading ? "Loading courses..." : "No courses found!"}
                       </td>
                     </tr>
@@ -480,6 +604,7 @@ useEffect(()=>{
                             onClick={() => {
                               setIsedit(true);
                               setIsAdd(true);
+                              Seteditform(cour);
                               
                             }}
                           >
