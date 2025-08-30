@@ -278,7 +278,7 @@ router.post("/addcourse", async (req, res, next) => {
 
 router.get("/courses/filter", async (req, res, next) => {
   const db = req.db;
-  const { department, sem } = req.body;
+  const { department, sem } = req.query;
 
   try {
     let query = "SELECT * FROM courses WHERE 1=1";

@@ -182,6 +182,60 @@ function AdminCourseManage({ setActiveTab, setEmessage, setMessage }) {
     }
   };
 
+  //--------------------------------------------------------------------------------------
+
+  const handleCourseFilter=async()=>{
+    if (!filterDep){
+      setfilterSem("1");
+      return
+    }
+    try{
+      const Token = localStorage.getItem("Token");
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/admin/courses/filter`,
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+            "Content-Type": "application/json",
+          },
+          params:{
+          department:filterDep||"",
+          sem:filterSem||"1"
+        }
+        },
+        
+      );
+
+      if(response.data.emessage){
+        setEmessage(response.data.emessage)
+        setcourses([])
+      }
+      if(response.data.success){
+        setcourses(response.data.courses)
+      }
+
+    }catch(err){
+      console.log("Error in getting filtered courses:",err)
+    }
+
+  };
+
+  useEffect(()=>{
+    if(filterDep){
+
+    handleCourseFilter()
+    }else{
+      setfilterSem("");
+      fetchcourses()
+    }
+
+
+  },[filterDep,filterSem])
+
+useEffect(()=>{
+  fetchdep()
+},[])
+
   useEffect(() => {
     fetchcourses();
   }, []);

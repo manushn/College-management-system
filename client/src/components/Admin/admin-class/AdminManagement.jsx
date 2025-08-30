@@ -1,5 +1,6 @@
 import React,{useState,useEffect} from 'react'
 import "./css/Adminclasses.css"
+import "./css/admincoursemanage.css"
 import axios from "axios"
 
 function AdminManagement({setActiveTab,setEmessage,setMessage}) {
@@ -63,7 +64,6 @@ function AdminManagement({setActiveTab,setEmessage,setMessage}) {
     }finally{setCourseloading(false)}
   };
 
-  
 
   useEffect(() => {
     fetchcourses();
