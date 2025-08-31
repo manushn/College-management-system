@@ -162,13 +162,14 @@ function AdminManagement({setActiveTab,setEmessage,setMessage}) {
               </table>
             <button onClick={()=>{setActiveTab('managecourses')}}>Manage courses</button>
           </div>
-          <div className="adminmanagent-tablecard">
+  <div className="adminmanagent-tablecard">
   <h3>Timetables</h3>
   <div className="timetable-head">
     <p><b>DEPT:</b> ARTIFICIAL INTELIGENCE AND DATA SCIENCE</p>
     <p><b>HALL NO:</b> C201</p> 
     <p><b>YEAR/SEM:</b> III/05</p>
     <p><b>W.E.F:</b> 2025-08-18</p>
+
   </div>
   <table className="timetable-table">
     <thead>

@@ -1,0 +1,66 @@
+.admin-timetable-main{
+    display: flex;
+    flex-direction: column;
+}
+.admin-timetable-head{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 1%;
+    padding-right: 7%;
+    border-bottom: 1px solid rgb(211, 211, 211);
+}
+.admin-timetable-head button{
+    color: black;
+    background-color: white;
+    border: 1px solid black;
+    padding: 5px;
+    border-radius: 5px;
+}
+.admin-timetable-head button:hover{
+    background-color: black;
+    color: white;
+    cursor: pointer;
+}
+.admin-timetable-body{
+    margin-right: 4%;
+    margin-bottom: 10%;
+    overflow-x: auto;   
+     overflow-y: auto; 
+    
+}
+.adminmanagent-tablecard {
+  padding: 10px;  
+  
+  
+}
+.admin-timetable-add-main{
+    height: 75vh;
+    margin-bottom: 10%;
+}
+
+.timetable-table {
+  border-collapse: collapse;
+  min-width: 1100px; 
+  width: 100%;
+}
+
+.timetable-table th,
+.timetable-table td {
+  border: 1px solid #ccc;
+  padding: 6px;
+  text-align: center;
+  white-space: nowrap; /* keeps content in one line */
+}
+.timetable-table tbody tr td div input{
+    width: 55px;
+    text-align: center;
+    padding: 5px;
+    margin-bottom: 2px;
+    border: 1px solid rgb(211, 211, 211);
+    border-radius: 5px;
+    font-weight: bold;
+    color: #2c6adb;
+
+}
+
