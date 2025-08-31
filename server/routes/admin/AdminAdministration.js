@@ -83,40 +83,6 @@ router.get("/staffnamesug", async (req, res, next) => {
 
 
 //-------------------------------------------------------------------------------
-
-router.delete("/deletedep", async (req, res, next) => {
-  const db = req.db;
-  const depid = req.body.depid;
-  
-
-  if (!depid) {
-    return res.status(203).json({ emessage: "Department ID is required" });
-  }
-
-  try {
-    
-    const [existing] = await db.promise().query(
-      "SELECT * FROM department WHERE dep_id = ?",
-      [depid]
-    );
-    if (existing.length === 0) {
-      return res.status(203).json({ emessage: "Department not found" });
-    }
-
-   
-    await db.promise().query(
-      "DELETE FROM department WHERE dep_id = ?",
-      [depid]
-    );
-    return res.status(200).json({ message: "Department deleted successfully", success: true });
-  } catch (error) {
-    console.error("Delete dep error:", error);
-    next(error);
-    return res.status(500).json({ emessage: "Server error" });
-  }
-});
-
-//-------------------------------------------------------------------------------
 router.put("/editdep", async (req, res, next) => {
   const db = req.db;
   
@@ -297,7 +263,7 @@ router.get("/courses/filter", async (req, res, next) => {
     return res.status(500).json({ emessage: "Server error" });
   }
 });
-
+//-------------------------------------------------------------------------------
 
 router.get("/courses/search", async (req, res, next) => {
   const db = req.db;
@@ -325,7 +291,7 @@ router.get("/courses/search", async (req, res, next) => {
     return res.status(500).json({ emessage: "Server error" });
   }
 });
-
+//-------------------------------------------------------------------------------
 
 router.put("/updatecourse/:id", async (req, res, next) => {
   const db = req.db;
@@ -391,5 +357,6 @@ router.put("/updatecourse/:id", async (req, res, next) => {
     return res.status(500).json({ emessage: "Server error" });
   }
 });
+//-------------------------------------------------------------------------------
 
 module.exports = router;

@@ -3,7 +3,9 @@ input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-
+body {
+  overflow: hidden;   
+}
 
 input[type=number] {
   -moz-appearance: textfield;
@@ -17,9 +19,10 @@ input[type=number] {
 .admin-course-head{
     display: flex;
     justify-content: space-between;
-    margin-left: 10px;
-    margin-right: 10%;
+    padding-left: 10px;
+    padding-right: 10%;
     align-items: center;
+    border-bottom: 1px solid rgb(227, 226, 226);
 }
 .admin-course-head button{
     background-color: white;
@@ -27,6 +30,11 @@ input[type=number] {
     border: 1px solid black;
     padding: 5px;
     border-radius: 5px;
+    cursor: pointer;
+}
+.admin-course-head button:hover{
+  background-color: black;
+  color: white;
 }
 .admin-course-body {
   margin-left: 1%;

@@ -2,6 +2,9 @@
   display: flex;
   flex-direction: column;
 }
+body {
+  overflow: hidden;   
+}
 
 .admin-dep-main-head {
   display: flex;

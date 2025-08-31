@@ -388,7 +388,7 @@ useEffect(()=>{
   return (
     <div className="admin-course-main">
       <div className="admin-course-head">
-        <h1>Manage Course</h1>
+        <h2>Manage Course</h2>
         <button onClick={() => setActiveTab("")}>Back</button>
       </div>
       <div className="admin-course-body">

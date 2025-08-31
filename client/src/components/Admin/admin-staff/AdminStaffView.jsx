@@ -235,6 +235,9 @@ const getFilteredStaff=async()=>{
                   <b>Username:</b> {Staffdetails[0].username}
                 </p>
                 <p>
+                  <b>Staff Code:</b> {Staffdetails[0].staff_code}
+                </p>
+                <p>
                   <b>Department:</b> {Staffdetails[0].department}
                 </p>
                 <p>

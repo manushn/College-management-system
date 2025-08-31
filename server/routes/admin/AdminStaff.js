@@ -46,7 +46,7 @@ router.post("/addstaff", upload.single("photo"), async (req, res) => {
 
   
   const requiredFields = [
-    "prefix", "first_name", "last_name", "gender", "date_of_birth",
+    "prefix", "first_name", "last_name", "gender", "date_of_birth","staff_code",
     "phone_number", "email", "personal_email", "address", "city", "state", "pincode",
     "emergency_contact_name", "emergency_contact_number", "designation", "department",
     "role_type", "employment_type", "reporting_manager", "staff_status",
@@ -98,19 +98,19 @@ router.post("/addstaff", upload.single("photo"), async (req, res) => {
    
     const insertStaffQuery = `
       INSERT INTO staff (
-        username, prefix, first_name, last_name, gender, date_of_birth,
+        username, prefix, first_name, last_name, gender, date_of_birth,staff_code
         photo_url, phone_number, email, personal_email, address, city, state, pincode,
         emergency_contact_name, emergency_contact_number, designation, department,
         role_type, employment_type, reporting_manager, staff_status, aadhar_number,
         pan_number, bank_account_number, bank_name, ifsc_code, salary,
         highest_qualification, specialization, role, joining_date
-      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     `;
 
    
     await db.promise().query(insertStaffQuery, [
       username, staffData.prefix, staffData.first_name, staffData.last_name,
-      staffData.gender, staffData.date_of_birth, photoUrl, staffData.phone_number,
+      staffData.gender, staffData.date_of_birth,staffData.staff_code, photoUrl, staffData.phone_number,
       staffData.email, staffData.personal_email, staffData.address, staffData.city,
       staffData.state, staffData.pincode, staffData.emergency_contact_name,
       staffData.emergency_contact_number, staffData.designation, staffData.department,
@@ -134,7 +134,7 @@ router.post("/addstaff", upload.single("photo"), async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Staff added successfully",
-      username: username
+      
     });
 
   } catch (error) {
@@ -157,7 +157,8 @@ router.post("/addstaff", upload.single("photo"), async (req, res) => {
         email: "Email",
         phone_number: "Phone Number",
         pan_number: "PAN Number",
-        username: "Username"
+        username: "Username",
+        staff_code:"staff_code"
       };
       fieldName = friendlyNames[fieldName] || fieldName.replace(/_/g, " ");
 
@@ -204,8 +205,8 @@ router.post("/getstaffusername", async (req, res) => {
     db.query(
       `SELECT username, prefix, first_name, last_name, gender, photo_url, designation, department, staff_status 
        FROM staff 
-       WHERE first_name LIKE ? OR last_name LIKE ? OR username LIKE ?`,
-      [`%${username}%`, `%${username}%`,`%${username}%`],
+       WHERE first_name LIKE ? OR last_name LIKE ? OR username LIKE ? OR staff_code LIKE ? `,
+      [`%${username}%`, `%${username}%`,`%${username}%`,`%${username}%`],
       (error, result) => {
         if (error) {
           return res.status(500).json({ emessage: "Database Error", error: error });
@@ -305,7 +306,7 @@ router.post("/updatestaff", upload.single("photo"), async (req, res) => {
   }
 
   const requiredFields = [
-    "prefix", "first_name", "last_name", "gender", "date_of_birth",
+    "prefix", "first_name", "last_name", "gender", "date_of_birth","staff_code",
     "phone_number", "email", "personal_email", "address", "city", "state", "pincode",
     "emergency_contact_name", "emergency_contact_number", "designation", "department",
     "role_type", "employment_type", "reporting_manager", "staff_status",
@@ -348,7 +349,7 @@ router.post("/updatestaff", upload.single("photo"), async (req, res) => {
       
       const updateQuery = `
         UPDATE staff SET 
-          prefix = ?, first_name = ?, last_name = ?, gender = ?, date_of_birth = ?,
+          prefix = ?, first_name = ?, last_name = ?, gender = ?, date_of_birth = ?,staff_code=?,
           photo_url = ?, phone_number = ?, email = ?, personal_email = ?, address = ?, 
           city = ?, state = ?, pincode = ?, emergency_contact_name = ?, emergency_contact_number = ?,
           designation = ?, department = ?, role_type = ?, employment_type = ?, reporting_manager = ?,
@@ -359,7 +360,7 @@ router.post("/updatestaff", upload.single("photo"), async (req, res) => {
 
       db.query(updateQuery, [
         staffData.prefix, staffData.first_name, staffData.last_name,
-        staffData.gender, staffData.date_of_birth, photoUrl, staffData.phone_number,
+        staffData.gender, staffData.date_of_birth,staffData.staff_code, photoUrl, staffData.phone_number,
         staffData.email, staffData.personal_email, staffData.address, staffData.city,
         staffData.state, staffData.pincode, staffData.emergency_contact_name,
         staffData.emergency_contact_number, staffData.designation, staffData.department,
@@ -380,7 +381,8 @@ router.post("/updatestaff", upload.single("photo"), async (req, res) => {
               aadhar_number: "Aadhar Number",
               email: "Email",
               phone_number: "Phone Number",
-              pan_number: "PAN Number"
+              pan_number: "PAN Number",
+              staff_code:"staff_code"
             };
             fieldName = friendlyNames[fieldName] || fieldName.replace(/_/g, " ");
 

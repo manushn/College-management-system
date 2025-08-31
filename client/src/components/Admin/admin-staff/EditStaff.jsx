@@ -13,6 +13,7 @@ function EditStaff({ selectedStaff ,setIsEditing,setEmessage,setMessage}) {
     prefix: "",
     first_name: "",
     last_name: "",
+    staff_code:"",
     gender: "",
     date_of_birth: "",
     phone_number: "",
@@ -315,6 +316,8 @@ function EditStaff({ selectedStaff ,setIsEditing,setEmessage,setMessage}) {
             placeholder="Date of Birth"
             required
           />
+          <input type="text" name="staff_code" value={staffData.staff_code} onChange={handleTextChange} placeholder="Staff_code" maxLength={4} required />
+
           <input type="text" inputMode="numeric" pattern="[0-9]*" name="phone_number" value={staffData.phone_number} onChange={handleNumberChange} placeholder="Phone Number" required />
           <input type="email" name="email" value={staffData.email} onChange={handleemailChange} placeholder="Work Email" required />
           <input type="email" name="personal_email" value={staffData.personal_email} onChange={handleemailChange} placeholder="Personal Email" required />

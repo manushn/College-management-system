@@ -178,41 +178,7 @@ const handleEdit=(dep)=>{
 
 }
 //-------------------------------------------------------------------------------
-const handleDeleteDepartment = async () => {
-    if (confirmcheck !== "DELETE") {
-      setEmessage("Please type DELETE to confirm.");
-      return;
-    }
-    const Token = localStorage.getItem("Token");
-    setIsloading(true);
-    try {
-      const response = await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/admin/deletedep`,
-        
-        {
-          headers: {
-            Authorization: `Bearer ${Token}`,
-            "Content-Type": "application/json",
-          },
-          data:{ depid: deleteDeptId },
-          
-        }
-      );
-      if (response.data.emessage) setEmessage(response.data.emessage);
-      if (response.data.success) {
-        setMessage(response.data.message);
-        setdeleteConfirm(false);
-        setdeleteDeptId("");
-        setconfirmcheck("");
-        fetchdep();
-      }
-    } catch (err) {
-      setEmessage("Error deleting department.");
-      console.log("Error deleting department:", err);
-    } finally {
-      setIsloading(false);
-    }
-  };
+
 
 
 
@@ -330,8 +296,6 @@ const handleDeleteDepartment = async () => {
                       <td>{dep.dep_hodid}</td>
                       <td>
                         <button className='dep-edit-btn' onClick={()=>{handleEdit(dep)}}>Edit</button>
-      
-                        <button onClick={()=>{setdeleteConfirm(true);setdeleteDeptId(dep.dep_id)}}>Delete</button>
                       </td>
                   </tr>
                   ))
@@ -340,27 +304,7 @@ const handleDeleteDepartment = async () => {
             </table>
             <button onClick={()=>{setShowAdd(true)}}>Add Department</button>
           </div>
-          {
-            deleteConfirm&&(
-              <div className="dep-delete-confirm-main">
-                <div className="dep-delete-confirm">
-                      <p>Type DELETE to delete the department.</p>
-                      <input 
-                          type="text"
-                          onChange={(e)=>{setconfirmcheck(e.target.value.trim())}}
-                          value={confirmcheck}
-                      />
-                <div className="dep-delete-confirm-btn">
-                  <button onClick={()=>{setdeleteConfirm(false);setconfirmcheck("")}}>Cancel</button>
-                  <div className="delete-btn">
-                  <button onClick={()=>{handleDeleteDepartment()}}>Delete</button>
-                  </div>
-                </div>
-                </div>
-                
-              </div>
-            )
-          }
+          
 
           </div>
           </>
