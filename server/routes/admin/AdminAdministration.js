@@ -62,15 +62,16 @@ router.get("/staffnamesug", async (req, res, next) => {
 
   try {
     const [staffnames] = await db.promise().query(
-      `SELECT username, prefix, first_name, last_name 
+      `SELECT username, prefix, first_name, last_name ,staff_code
        FROM staff 
        WHERE first_name LIKE ? OR last_name LIKE ? OR username LIKE ?`,
       [`%${typedName}%`, `%${typedName}%`, `%${typedName}%`]
     );
 
-    const suggestions = staffnames.map(({ username, prefix, first_name, last_name }) => ({
+    const suggestions = staffnames.map(({ username, prefix, first_name, last_name ,staff_code}) => ({
       username,
-      staffname: `${prefix} ${first_name} ${last_name}`.trim()
+      staffname: `${prefix} ${first_name} ${last_name}`.trim(),
+      staff_code: staff_code
     }));
 
     return res.json({ suggestions });
@@ -358,5 +359,60 @@ router.put("/updatecourse/:id", async (req, res, next) => {
   }
 });
 //-------------------------------------------------------------------------------
+
+router.get("/coursecodesug", async (req, res, next) => {
+  const db = req.db;
+  const typedName = req.query.typedName || '';
+
+  try {
+    const [courseCode] = await db.promise().query(
+      `SELECT course_code
+       FROM courses
+       WHERE course_code LIKE ?`,
+      [`%${typedName}%`]
+    );
+
+    
+
+    return res.json({ courseCode:courseCode[0]});
+
+  } catch (err) {
+    console.error("Error in staffnamesug:", err);
+    return res.status(500).json({ emessage: "Server error", error: err.message });
+  }
+});
+
+router.post("/addtimetable", async (req, res) => {
+  try {
+    const timetable = req.body;
+    const db = req.db;
+
+    
+    for (const [key, value] of Object.entries(timetable)) {
+      if (value === null || value === undefined || value === "") {
+        return res.status(203).json({
+          emessage: `Missing or empty value for field: ${key}`,
+        });
+      }
+    }
+
+    const keys = Object.keys(timetable);
+    const values = Object.values(timetable);
+
+    const placeholders = keys.map(() => "?").join(",");
+    const query = `INSERT INTO timetable (${keys.join(",")}) VALUES (${placeholders})`;
+
+    const [result] = await db.promise().query(query, values);
+
+    res.status(201).json({
+      success: true,
+      message: "Timetable added successfully",
+      
+    });
+  } catch (err) {
+    console.error("Error inserting timetable:", err);
+    res.status(500).json({ success: false, message: "Failed to save timetable" });
+  }
+});
 
 module.exports = router;

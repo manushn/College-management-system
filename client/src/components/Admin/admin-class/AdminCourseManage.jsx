@@ -79,7 +79,7 @@ function AdminCourseManage({ setActiveTab, setEmessage, setMessage }) {
         setMessage("Course added successfully!");
         clearForm();
         setIsAdd(false);
-        fetchcourses(); // refresh courses list
+        fetchcourses(); 
       } else if (response.data.emessage) {
         setEmessage(response.data.emessage);
       }
@@ -224,7 +224,7 @@ function AdminCourseManage({ setActiveTab, setEmessage, setMessage }) {
   };
 
   useEffect(() => {
-  // if search is cleared, reload all courses
+
   if (!filterchar.trim()) {
     fetchcourses();
     return;
