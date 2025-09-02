@@ -5,7 +5,7 @@ function HeadHome() {
   const navigate=useNavigate();
     const Role=sessionStorage.getItem('role');
     useEffect(()=>{
-      console.log("Checking")
+      
       if(Role!=='head'){
         alert("Invalid Access Dedected Redirecting...")
         

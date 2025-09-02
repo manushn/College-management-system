@@ -7,7 +7,7 @@ function AdminHome() {
   const navigate=useNavigate();
   const Role=sessionStorage.getItem('role');
   useEffect(()=>{
-    console.log("Checking")
+    
     if(Role!=='admin'){
       alert("Invalid Access Dedected Redirecting...")
       

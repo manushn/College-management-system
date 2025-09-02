@@ -5,8 +5,9 @@ import "./css/Adminclasses.css"
 
 function TimeTableManage({setActiveTab,setEmessage,setMessage}) {
 
-  const [IsAdd,setIsAdd]=useState(true);
+  const [IsAdd,setIsAdd]=useState(false);
   const [IsEdit,setIsedit]=useState(false);
+  const [Isloading,setIsloading]=useState(false);
 
   const [timetable, setTimetable] = useState({
     dep: "",
@@ -29,18 +30,27 @@ function TimeTableManage({setActiveTab,setEmessage,setMessage}) {
   });
 
   const [departments,setdepartments]=useState([]);
+  const [Timetables,setTimetables]=useState([]);
+
+  const [filterdep,setfilterdep]=useState("");
+  const [filterhallno,setfilterhallno]=useState("");
+  const [filtersem,setfiltersem]=useState("");
+  const [filterdiv,setfilterdiv]=useState("");
 
  
   const [StaffcodeSearch,setStaffcodeSearch]=useState('');
   const [CoursecodeSearch,setCoursecodeSearch]=useState("");
   const [CourseCodeSug,setCourseCodeSug]=useState([]);
   const [StaffCodeSug,setStaffCodeSug]=useState([]);
+  const [Currentpositon,setCurrentposition]=useState("");
+  const [Currentstaffposition,setCurrentstaffposition]=useState("");
 
-
+//-------------------------------------------------------------------------------
   const fetchStaffCode =async()=>{
       try{
 
-            if(StaffcodeSearch.length<1) return;
+            if(StaffcodeSearch.length<1||StaffcodeSearch.length>3) return;
+            
 
             const Token = localStorage.getItem("Token");
 
@@ -64,16 +74,21 @@ function TimeTableManage({setActiveTab,setEmessage,setMessage}) {
             console.log("Error in Fetching staff Code",err)
       }
   } 
+  //-------------------------------------------------------------------------------
 
   useEffect(() => {
+      if(StaffcodeSearch.length<1||StaffcodeSearch.length>3){
+            setStaffCodeSug([]);
+      }
   fetchStaffCode();
 }, [StaffcodeSearch]);
-  
+
+//-------------------------------------------------------------------------------
 
 const fetchCourseCode =async()=>{
       try{
 
-            if(CoursecodeSearch.length<1) return;
+            if(CoursecodeSearch.length<1||CoursecodeSearch.length>5) return;
 
             const Token = localStorage.getItem("Token");
 
@@ -88,8 +103,8 @@ const fetchCourseCode =async()=>{
                   }
             );
 
-            if (response.data.suggestions) {
-                  setCourseCodeSug(response.data.suggestions);
+            if (response.data.courseCode) {
+                  setCourseCodeSug(response.data.courseCode);
       
             }
       
@@ -97,9 +112,16 @@ const fetchCourseCode =async()=>{
             console.log("Error in Fetching course Code",err)
       }
   } 
+//-------------------------------------------------------------------------------
+
 useEffect(() => {
+      if(CoursecodeSearch.length<1||CoursecodeSearch.length>5){
+            setCourseCodeSug([]);
+      }
   fetchCourseCode();
+  
 }, [CoursecodeSearch]);
+//-------------------------------------------------------------------------------
 
   const fetchdep = async () => {
     const Token = localStorage.getItem("Token");
@@ -124,6 +146,7 @@ useEffect(() => {
       console.log("Error in fetching dep:", err);
     }
   };
+//-------------------------------------------------------------------------------
 
   const validateTimetable = () => {
   for (let key in timetable) {
@@ -133,6 +156,8 @@ useEffect(() => {
   }
   return true;
 };
+
+//-------------------------------------------------------------------------------
 
 const handleSubmit = async () => {
   if (!validateTimetable()) {
@@ -166,13 +191,42 @@ const handleSubmit = async () => {
     setEmessage("Server error while saving timetable");
   }
 };
+//-------------------------------------------------------------------------------
+const fetchtimetable = async () => {
+    const Token = localStorage.getItem("Token");
+    try {
+      setIsloading(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/admin/gettimetable`,
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.data.emessage) {
+        setEmessage(response.data.emessage);
+        setTimetables([]);
+      }
+      if (response.data.success) {
+        setTimetables(response.data.timetable);
+      }
+    } catch (err) {
+      console.log("Error in fetching dep:", err);
+    }finally{
+      setIsloading(false)
+    }
+  };
 
-
+//-------------------------------------------------------------------------------
   useEffect(()=>{
-      if(!IsAdd) return;
+      
       fetchdep();
+      fetchtimetable();
 
   },[IsAdd])
+//-------------------------------------------------------------------------------
 
   return (
     <div className="admin-timetable-main">
@@ -193,7 +247,7 @@ const handleSubmit = async () => {
                       <select value={timetable.dep} onChange={ (e)=>setTimetable({...timetable, dep: e.target.value })} required>
                         <option value="">Select Department</option>
                         {departments.map((dep) => (
-                        <option key={dep.dep_id} value={dep.dep_id}>
+                        <option key={dep.dep_name} value={dep.name}>
                               {dep.dep_name}
                         </option>
                         ))}
@@ -271,24 +325,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd1cd1} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                name='rd1cd1'
+                                maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
                                           setTimetable({ ...timetable, rd1cd1: value });
                                           setCoursecodeSearch(value);
+                                          setCurrentposition('rd1cd1')
+                                          setCurrentstaffposition('rs1cs1')
                               }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs1cs1} 
+                                defaultValue={timetable.rs1cs1} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => {
-                                          const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rs1cs1: value });
-                                          setStaffcodeSearch(value);
-                              }}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
 
@@ -297,15 +348,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd1cd2} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd1cd2: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd1cd2: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd1cd2')
+                                          setCurrentstaffposition('rs1cs2')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs1cs2} 
+                                defaultValue={timetable.rs1cs2} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs1cs2: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
 
@@ -316,15 +373,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd1cd3} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd1cd3: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd1cd3: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd1cd3')
+                                          setCurrentstaffposition('rs1cs3')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs1cs3} 
+                                defaultValue={timetable.rs1cs3} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs1cs3: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
 
@@ -333,15 +396,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd1cd4} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd1cd4: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd1cd4: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd1cd4')
+                                          setCurrentstaffposition('rs1cs4')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs1cs4} 
+                                defaultValue={timetable.rs1cs4} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs1cs4: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td className="break-col"></td>
@@ -350,15 +419,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd1cd5} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd1cd5: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd1cd5: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd1cd5')
+                                          setCurrentstaffposition('rs1cs5')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs1cs5} 
+                                defaultValue={timetable.rs1cs5} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs1cs5: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td>
@@ -366,15 +441,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd1cd6} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd1cd6: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd1cd6: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd1cd6')
+                                          setCurrentstaffposition('rs1cs6')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs1cs6} 
+                                defaultValue={timetable.rs1cs6} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs1cs6: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td className="break-col"></td>
@@ -383,15 +464,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd1cd7} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd1cd7: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd1cd7: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd1cd7')
+                                          setCurrentstaffposition('rs1cs7')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs1cs7} 
+                                defaultValue={timetable.rs1cs7} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs1cs7: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                     </tr>
@@ -402,15 +489,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd2cd1} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd2cd1: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd2cd1: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd2cd1')
+                                          setCurrentstaffposition('rs2cs1')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs2cs1} 
+                                defaultValue={timetable.rs2cs1} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs2cs1: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td>
@@ -418,15 +511,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd2cd2} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd2cd2: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd2cd2: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd2cd2')
+                                          setCurrentstaffposition('rs2cs2')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs2cs2} 
+                                defaultValue={timetable.rs2cs2} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs2cs2: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td className="break-col"></td>
@@ -435,15 +534,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd2cd3} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd2cd3: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd2cd3: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd2cd3')
+                                          setCurrentstaffposition('rs2cs3')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs2cs3} 
+                                defaultValue={timetable.rs2cs3} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs2cs3: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td>
@@ -451,15 +556,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd2cd4} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd2cd4: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd2cd4: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd2cd4')
+                                          setCurrentstaffposition('rs2cs4')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs2cs4} 
+                                defaultValue={timetable.rs2cs4} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs2cs4: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td className="break-col"></td>
@@ -468,15 +579,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd2cd5} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd2cd5: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd2cd5: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd2cd5')
+                                          setCurrentstaffposition('rs2cs5')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs2cs5} 
+                                defaultValue={timetable.rs2cs5} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs2cs5: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td>
@@ -484,15 +601,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd2cd6} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd2cd6: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd2cd6: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd2cd6')
+                                          setCurrentstaffposition('rs2cs6')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs2cs6} 
+                                defaultValue={timetable.rs2cs6} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs2cs6: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td className="break-col"></td>
@@ -501,15 +624,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd2cd7} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd2cd7: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd2cd7: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd2cd7')
+                                          setCurrentstaffposition('rs2cs7')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs2cs7} 
+                                defaultValue={timetable.rs2cs7} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs2cs7: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
 
@@ -521,15 +650,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd3cd1} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd3cd1: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd3cd1: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd3cd1')
+                                          setCurrentstaffposition('rs3cs1')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs3cs1} 
+                                defaultValue={timetable.rs3cs1} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs3cs1: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td>
@@ -537,15 +672,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd3cd2} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd3cd2: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd3cd2: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd3cd2')
+                                          setCurrentstaffposition('rs3cs2')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs3cs2} 
+                                defaultValue={timetable.rs3cs2} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs3cs2: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td className="break-col"></td>
@@ -554,15 +695,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd3cd3} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd3cd3: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd3cd3: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd3cd3')
+                                          setCurrentstaffposition('rs3cs3')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs3cs3} 
+                                defaultValue={timetable.rs3cs3} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs3cs3: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td>
@@ -570,15 +717,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd3cd4} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd3cd4: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd3cd4: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd3cd4')
+                                          setCurrentstaffposition('rs3cs4')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs3cs4} 
+                                defaultValue={timetable.rs3cs4} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs3cs4: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td className="break-col"></td>
@@ -587,15 +740,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd3cd5} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd3cd5: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd3cd5: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd3cd5')
+                                          setCurrentstaffposition('rs3cs5')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs3cs5} 
+                                defaultValue={timetable.rs3cs5} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs3cs5: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td>
@@ -603,15 +762,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd3cd6} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd3cd6: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd3cd6: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd3cd6')
+                                          setCurrentstaffposition('rs3cs6')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs3cs6} 
+                                defaultValue={timetable.rs3cs6} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs3cs6: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td className="break-col"></td>
@@ -620,15 +785,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd3cd7} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd3cd7: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd3cd7: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd3cd7')
+                                          setCurrentstaffposition('rs3cs7')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs3cs7} 
+                                defaultValue={timetable.rs3cs7} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs3cs7: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                     </tr>
@@ -640,15 +811,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd4cd1} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd4cd1: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd4cd1: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd4cd1')
+                                          setCurrentstaffposition('rs4cs1')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs4cs1} 
+                                defaultValue={timetable.rs4cs1} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs4cs1: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td>
@@ -656,15 +833,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd4cd2} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd4cd2: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd4cd2: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd4cd2')
+                                          setCurrentstaffposition('rs4cs2')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs4cs2} 
+                                defaultValue={timetable.rs4cs2} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs4cs2: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td className="break-col"></td>
@@ -673,15 +856,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd4cd3} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd4cd3: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd4cd3: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd4cd3')
+                                          setCurrentstaffposition('rs4cs3')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs4cs3} 
+                                defaultValue={timetable.rs4cs3} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs4cs3: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td>
@@ -689,15 +878,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd4cd4} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd4cd4: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd4cd4: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd4cd4')
+                                          setCurrentstaffposition('rs4cs4')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs4cs4} 
+                                defaultValue={timetable.rs4cs4} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs4cs4: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td className="break-col"></td>
@@ -706,15 +901,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd4cd5} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd4cd5: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd4cd5: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd4cd5')
+                                          setCurrentstaffposition('rs4cs5')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs4cs5} 
+                                defaultValue={timetable.rs4cs5} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs4cs5: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td>
@@ -722,15 +923,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd4cd6} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd4cd6: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd4cd6: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd4cd6')
+                                          setCurrentstaffposition('rs4cs6')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs4cs6} 
+                                defaultValue={timetable.rs4cs6} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs4cs6: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td className="break-col"></td>
@@ -739,15 +946,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd4cd7} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd4cd7: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd4cd7: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd4cd7')
+                                          setCurrentstaffposition('rs4cs7')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs4cs7} 
+                                defaultValue={timetable.rs4cs7} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs4cs7: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                     </tr>
@@ -758,15 +971,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd5cd1} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd5cd1: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd5cd1: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd5cd1')
+                                          setCurrentstaffposition('rs5cs1')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs5cs1} 
+                                defaultValue={timetable.rs5cs1} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs5cs1: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td>
@@ -774,15 +993,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd5cd2} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd5cd2: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd5cd2: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd5cd2')
+                                          setCurrentstaffposition('rs5cs2')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs5cs2} 
+                                defaultValue={timetable.rs5cs2} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs5cs2: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td className="break-col"></td>
@@ -791,15 +1016,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd5cd3} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd5cd3: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd5cd3: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd5cd3')
+                                          setCurrentstaffposition('rs5cs3')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs5cs3} 
+                                defaultValue={timetable.rs5cs3} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs5cs3: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td>
@@ -807,15 +1038,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd5cd4} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd5cd4: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd5cd4: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd5cd4')
+                                          setCurrentstaffposition('rs5cs4')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs5cs4} 
+                                defaultValue={timetable.rs5cs4} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs5cs4: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td className="break-col"></td>
@@ -824,15 +1061,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd5cd5} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd5cd5: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd5cd5: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd5cd5')
+                                          setCurrentstaffposition('rs5cs5')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs5cs5} 
+                                defaultValue={timetable.rs5cs5} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs5cs5: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td>
@@ -840,15 +1083,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd5cd6} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd5cd6: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd5cd6: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd5cd6')
+                                          setCurrentstaffposition('rs5cs6')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs5cs6} 
+                                defaultValue={timetable.rs5cs6} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs5cs1: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                       <td className="break-col"></td>
@@ -857,15 +1106,21 @@ const handleSubmit = async () => {
                                 type="text"
                                 value={timetable.rd5cd7} 
                                 placeholder='SUB CODE'
-                                maxLength={8}
-                                onChange={(e) => setTimetable({ ...timetable, rd5cd7: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={6}
+                                onChange={(e) => {
+                                          const value = e.target.value.toUpperCase().trim();
+                                          setTimetable({ ...timetable, rd5cd7: value });
+                                          setCoursecodeSearch(value);
+                                          setCurrentposition('rd5cd7')
+                                          setCurrentstaffposition('rs5cs7')
+                              }}/>
                           </div>
                           <div><input 
                                 type="text"
-                                value={timetable.rs5cs7} 
+                                defaultValue={timetable.rs5cs7} 
                                 placeholder='STAFF CODE'
-                                maxLength={6}
-                                onChange={(e) => setTimetable({ ...timetable, rs5cs7: e.target.value.toUpperCase().trim() })}/>
+                                maxLength={4}
+                                />
                           </div>
                       </td>
                     </tr>
@@ -876,21 +1131,203 @@ const handleSubmit = async () => {
                 <button onClick={()=>{setIsAdd(false)}}>Cancel</button>
                 </div>
               </div>
-              {CourseCodeSug.length>0&&(
-                  <div className="suggesionpopup">
-                        
-                  </div>
-              )}
+              
           </div>
           
           </>
         ):(
           <>
-          <h1>Timetable view</h1>
-          <button onClick={()=>{setIsAdd(true)}}>Add</button>
+          <div className="timetable-view-admin-main">
+            <h2>Timetables</h2>
+            <div className="timetable-view-filter">
+                  <p>Filter by:</p>
+                  <p>
+                      <b>DEPT:</b>
+                      <select value={filterdep} onChange={ (e)=>setfilterdep(e.target.value)} required>
+                        <option value="">Select Department</option>
+                        {departments.map((dep) => (
+                        <option key={dep.dep_id} value={dep.dep_id}>
+                              {dep.dep_name}
+                        </option>
+                        ))}
+                      </select>
+                      
+                    </p>
+
+                    <p>
+                       <b>HALL NO:</b>
+                        <input 
+                             type="text"
+                             value={filterhallno}
+                             onChange={(e) => setfilterhallno(e.target.value.toUpperCase().trim())}
+                             required
+                        />
+                    </p> 
+
+                    <p>
+                        <b>SEM:</b>
+                        <select value={filtersem} onChange={(e) => setfiltersem(e.target.value)} required>
+                          <option value="">Semester</option>
+                              {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
+                              <option key={s} value={s}>
+                                    {s}
+                              </option>
+                              ))}
+                        </select>
+                        
+                    </p>
+
+                    <p>
+                        <b>DIVISION:</b>
+                        <select value={filterdiv} onChange={(e) => setfilterdiv(e.target.value)} required>
+                          <option value="">DIVISION</option>
+                              {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
+                              <option key={s} value={s}>
+                                    {s}
+                              </option>
+                              ))}
+                        </select>
+                        
+                    </p>
+
+            </div>
+            {Timetables.length>0?(
+            <>
+            <div className="adminmanagent-tablecard">
+  
+  <div className="timetable-head">
+    <p><b>DEPT:</b> {Timetables[0].dep}</p>
+    <p><b>HALL NO:</b> C201</p> 
+    <p><b>YEAR/SEM:</b> III/05</p>
+    <p><b>W.E.F:</b> 2025-08-18</p>
+
+  </div>
+  <table className="timetable-table">
+    <thead>
+      <tr>
+        <th>Day / Period</th>
+        <th>I</th>
+        <th>II</th>
+        <th className="break-col">Break 1</th>
+        <th>III</th>
+        <th>IV</th>
+        <th className="break-col">Lunch</th>
+        <th>V</th>
+        <th>VI</th>
+        <th className="break-col">Break II</th>
+        <th>VII</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Monday</td>
+        <td><div>AD3501</div><div>ABJ</div></td>
+        <td><div>CS3551</div><div>RPA</div></td>
+        <td className="break-col"></td>
+        <td><div>CCS366</div><div>ABJ</div></td>
+        <td><div>NM</div><div>KRM</div></td>
+        <td className="break-col"></td>
+        <td><div>NM</div><div>KRM</div></td>
+        <td><div>NM</div><div>KRM</div></td>
+        <td className="break-col"></td>
+        <td><div>NM</div><div>KRM</div></td>
+      </tr>
+      <tr>
+        <td>Tuesday</td>
+        <td><div>CW3551</div><div>TST</div></td>
+        <td><div>CS3551</div><div>RPA</div></td>
+        <td className="break-col"></td>
+        <td><div>CCS334</div><div>RPA</div></td>
+        <td><div>CCS334</div><div>RPA</div></td>
+        <td className="break-col"></td>
+        <td><div>AD5311</div><div>ABJ</div></td>
+        <td><div>AD5311</div><div>ABJ</div></td>
+        <td className="break-col"></td>
+        <td><div>AD5311</div><div>ABJ</div></td>
+
+      </tr>
+      <tr>
+        <td>Wednesday</td>
+        <td><div>CCS334</div><div>RPA</div></td>
+        <td><div>AD3501</div><div>ABJ</div></td>
+        <td className="break-col"></td>
+        <td><div>CCS334</div><div>RPA</div></td>
+        <td><div>AD3501</div><div>ABJ</div></td>
+        <td className="break-col"></td>
+        <td><div>MX3084</div><div>PPA</div></td>
+        <td><div>CCS369</div><div>ABJ</div></td>
+        <td className="break-col"></td>
+        <td><div>CCS369</div><div>ABJ</div></td>
+      </tr>
+      <tr>
+        <td>Thursday</td>
+        <td><div>CCS369</div><div>ABJ</div></td>
+        <td><div>CCS366</div><div>ABJ</div></td>
+        <td className="break-col"></td>
+        <td><div>CCS366</div><div>ABJ</div></td>
+        <td><div>AD3501</div><div>ABJ</div></td>
+        <td className="break-col"></td>
+        <td><div>CCS334</div><div>RPA</div></td>
+        <td><div>AD3501</div><div>ABJ</div></td>
+        <td className="break-col"></td>
+        <td><div>CW3551</div><div>TST</div></td>
+      </tr>
+      <tr>
+        <td>Friday</td>
+        <td><div>CCS366</div><div>ABJ</div></td>
+        <td><div>CW3551</div><div>TST</div></td>
+        <td className="break-col"></td>
+         <td><div>MX3084</div><div>PPA</div></td>
+        <td><div>CS3551</div><div>RPA</div></td>
+        <td className="break-col"></td>
+        <td><div>CCS369</div><div>ABJ</div></td>
+        <td><div>CCS369</div><div>ABJ</div></td>
+        <td className="break-col"></td>
+        <td><div>CCS369</div><div>ABJ</div></td>
+      </tr>
+    </tbody>
+  </table>
+  <button onClick={()=>{setActiveTab('managetimetable')}}>Manage Timetable</button>
+</div>
+            
+            </>
+            ):(
+                  <>
+                  <p>{Isloading?('Loading Timetable....'):("No Timetable available.")}</p>
+                  </>
+
+            )}
+          </div>
+          <div className="timetable-add-btn">
+            <button onClick={()=>{setIsAdd(true)}}>Add Timetable</button>
+          </div>
           </>
         )}
       </div>
+      {CourseCodeSug.length>0&&(
+                  <div className="suggesionpopup-main">
+                        <div className="suggesionpopup-box">
+                              <button onClick={()=>{setCourseCodeSug([])}}>X</button>
+                              <div className="suggesionpopup-con">
+                                    {CourseCodeSug.map((c, i) => (
+                                          <p 
+                                            key={i} 
+                                            onClick={() => {
+                                              setTimetable({ ...timetable, [Currentpositon]: c.course_code,[Currentstaffposition]:c.staff_code });
+                                              setCourseCodeSug([]);
+                                              setCurrentposition("")
+                                            }}
+                                          >
+                                            ({c.course_code}) - ({c.course_name}) - ({c.staff_code})
+                                          </p>
+                                    ))}
+                              </div>
+                        </div>
+                        
+                  </div>
+              )}
+
+              
     </div>
   )
 }

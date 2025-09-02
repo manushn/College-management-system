@@ -312,6 +312,7 @@ function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
             <option value="staff">Staff</option>
             <option value="head">Head</option>
             <option value="admin">Admin</option>
+
           </select>
           <button type="submit" disabled={submitting}>
             {submitting ? "Saving..." : "Save Staff"}

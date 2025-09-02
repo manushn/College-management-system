@@ -58,7 +58,10 @@ useEffect(()=>{
             navigate('/accountant-home')
           }else if(role==='student'){
             navigate('/student-home')
-          }else{
+          }else if(role==='staff'){
+            navigate('/staff-home')
+          }
+          else{
             console.log("Navigating to login from auto login")
             
             localStorage.removeItem("Token")
@@ -111,7 +114,10 @@ useEffect(()=>{
             navigate('/accountant-home')
           }else if(role==='student'){
             navigate('/student-home')
-          }else{
+          }else if(role==='staff'){
+            navigate('/staff-home')
+          }
+          else{
             console.log("Navigating to login from login")
             
             localStorage.removeItem("Token")

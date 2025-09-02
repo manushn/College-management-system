@@ -360,27 +360,32 @@ router.put("/updatecourse/:id", async (req, res, next) => {
 });
 //-------------------------------------------------------------------------------
 
-router.get("/coursecodesug", async (req, res, next) => {
+router.get("/coursecodesug", async (req, res) => {
   const db = req.db;
   const typedName = req.query.typedName || '';
 
   try {
-    const [courseCode] = await db.promise().query(
-      `SELECT course_code
-       FROM courses
-       WHERE course_code LIKE ?`,
-      [`%${typedName}%`]
+    const [courses] = await db.promise().query(
+      `SELECT 
+          c.course_id, 
+          c.course_code, 
+          c.course_name, 
+          c.staff_id, 
+          s.staff_code
+       FROM courses c
+       JOIN staff s ON c.staff_id = s.username
+       WHERE c.course_code LIKE ? OR c.course_name LIKE ?`,
+      [`%${typedName}%`, `%${typedName}%`]
     );
 
-    
-
-    return res.json({ courseCode:courseCode[0]});
+    return res.json({ courseCode: courses });
 
   } catch (err) {
-    console.error("Error in staffnamesug:", err);
+    console.error("Error in coursecodesug:", err);
     return res.status(500).json({ emessage: "Server error", error: err.message });
   }
 });
+//-------------------------------------------------------------------------------
 
 router.post("/addtimetable", async (req, res) => {
   try {
@@ -412,6 +417,47 @@ router.post("/addtimetable", async (req, res) => {
   } catch (err) {
     console.error("Error inserting timetable:", err);
     res.status(500).json({ success: false, message: "Failed to save timetable" });
+  }
+});
+//-------------------------------------------------------------------------------
+
+router.get("/gettimetable", async (req, res, next) => {
+  const db = req.db;
+
+  try {
+    
+    const [firstTimetable] = await db
+      .promise()
+      .query(
+        `SELECT * FROM timetable ORDER BY id ASC LIMIT 1`
+      );
+
+    if (firstTimetable.length === 0) {
+      return res.status(203).json({
+        success: true,
+        timetable: [],
+      });
+    }
+
+    const { sem, dep} = firstTimetable[0];
+
+    
+    const [Timetable] = await db
+      .promise()
+      .query(
+        `SELECT * FROM timetable WHERE sem = ? AND dep = ? AND division = 1 ORDER BY id ASC`,
+        [sem, dep]
+      );
+
+    return res.status(200).json({
+      success: true,
+      timetable: Timetable || [],
+    });
+
+  } catch (error) {
+    console.log("Error in GetTimetable:", error);
+    next(error);
+    return res.status(500).json({ emessage: "Server Error" });
   }
 });
 
