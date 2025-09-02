@@ -47,7 +47,25 @@ useEffect(()=>{
       if(response.data.success){
          localStorage.setItem("Token",response.data.Token);
          sessionStorage.setItem("isLoggedin",true)
-        navigate("/admin-home");
+         sessionStorage.setItem("role",response.data.role);
+          const role=response.data.role;
+          console.log("Role from autologin",role)
+          if(role==="admin"){
+            navigate('/admin-home')
+          }else if(role==='head'){
+            navigate('/head-home')
+          }else if(role==='accountant'){
+            navigate('/accountant-home')
+          }else if(role==='student'){
+            navigate('/student-home')
+          }else{
+            console.log("Navigating to login from auto login")
+            
+            localStorage.removeItem("Token")
+            sessionStorage.removeItem("isLoggedin")
+            sessionStorage.removeItem('role');
+            navigate('login');
+          }
       }
 
       
@@ -59,7 +77,7 @@ useEffect(()=>{
   }
   autologin()
 
-},[location.pathname])
+},[])
 
     
     
@@ -82,7 +100,25 @@ useEffect(()=>{
         if(response.data.success){
           localStorage.setItem("Token",response.data.token);
           sessionStorage.setItem("isLoggedin",true)
-          navigate("/admin-home");
+          sessionStorage.setItem("role",response.data.role);
+          const role=response.data.role;
+          console.log("Role from login",role)
+          if(role==="admin"){
+            navigate('/admin-home')
+          }else if(role==='head'){
+            navigate('/head-home')
+          }else if(role==='accountant'){
+            navigate('/accountant-home')
+          }else if(role==='student'){
+            navigate('/student-home')
+          }else{
+            console.log("Navigating to login from login")
+            
+            localStorage.removeItem("Token")
+            sessionStorage.removeItem("isLoggedin")
+            sessionStorage.removeItem('role');
+            navigate('login');
+          }
         }
 
     }catch(err){

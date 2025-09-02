@@ -109,7 +109,7 @@ router.post("/autologin",tokenVerify,async(req,res)=>{
                     JWT_KEY,
                     { expiresIn: '12h' });
 
-                return res.status(201).json({success:true,Token:token})
+                return res.status(201).json({success:true,Token:token,role:role})
 
             }else{
                 return res.json({success:false})

@@ -24,7 +24,7 @@ useEffect(() => {
     if (!token) {
       navigate("/login", { replace: true });
     }
-  }, [navigate]);
+  }, [navigate,activeTab]);
 
  
 useEffect(() => {

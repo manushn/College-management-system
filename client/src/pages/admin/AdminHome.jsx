@@ -1,7 +1,22 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import HeadingTab from '../../components/heading/HeadingTab'
 import Admindash from '../../components/Admin/admin-dashboard/Admindash'
+import { useNavigate } from 'react-router-dom';
+
 function AdminHome() {
+  const navigate=useNavigate();
+  const Role=sessionStorage.getItem('role');
+  useEffect(()=>{
+    console.log("Checking")
+    if(Role!=='admin'){
+      alert("Invalid Access Dedected Redirecting...")
+      
+      localStorage.removeItem("Token");
+      sessionStorage.removeItem('role');
+      sessionStorage.removeItem('isLoggedin')
+      navigate("/login", { replace: true });
+    }
+  },[])
   return (
     <div>
       <HeadingTab/>
