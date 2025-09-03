@@ -327,6 +327,22 @@ router.put("/updatecourse/:id", async (req, res, next) => {
   }
 
   try {
+    
+    await db.promise().beginTransaction();
+
+    
+    const [staffDetails] = await db.promise().query(
+      `SELECT staff_code FROM staff WHERE username = ?`,
+      [StaffId]
+    );
+    
+    const staffCode = staffDetails[0]?.staff_code;
+    if (!staffCode) {
+      await db.promise().rollback();
+      return res.status(302).json({ emessage: "Staff Code not available" });
+    }
+
+    
     const [result] = await db.promise().query(
       `UPDATE courses
        SET course_code = ?, course_name = ?, course_type = ?, credit = ?, dep_id = ?, dep_name = ?, 
@@ -348,16 +364,87 @@ router.put("/updatecourse/:id", async (req, res, next) => {
     );
 
     if (result.affectedRows === 0) {
+      await db.promise().rollback();
       return res.status(404).json({ emessage: "Course not found" });
     }
 
-    return res.status(200).json({ success: true, message: "Course updated successfully" });
+    
+    const query = `
+      UPDATE timetable
+      SET
+        rs1cs1 = CASE WHEN rd1cd1 = ? THEN ? ELSE rs1cs1 END,
+        rs1cs2 = CASE WHEN rd1cd2 = ? THEN ? ELSE rs1cs2 END,
+        rs1cs3 = CASE WHEN rd1cd3 = ? THEN ? ELSE rs1cs3 END,
+        rs1cs4 = CASE WHEN rd1cd4 = ? THEN ? ELSE rs1cs4 END,
+        rs1cs5 = CASE WHEN rd1cd5 = ? THEN ? ELSE rs1cs5 END,
+        rs1cs6 = CASE WHEN rd1cd6 = ? THEN ? ELSE rs1cs6 END,
+        rs1cs7 = CASE WHEN rd1cd7 = ? THEN ? ELSE rs1cs7 END,
+
+        rs2cs1 = CASE WHEN rd2cd1 = ? THEN ? ELSE rs2cs1 END,
+        rs2cs2 = CASE WHEN rd2cd2 = ? THEN ? ELSE rs2cs2 END,
+        rs2cs3 = CASE WHEN rd2cd3 = ? THEN ? ELSE rs2cs3 END,
+        rs2cs4 = CASE WHEN rd2cd4 = ? THEN ? ELSE rs2cs4 END,
+        rs2cs5 = CASE WHEN rd2cd5 = ? THEN ? ELSE rs2cs5 END,
+        rs2cs6 = CASE WHEN rd2cd6 = ? THEN ? ELSE rs2cs6 END,
+        rs2cs7 = CASE WHEN rd2cd7 = ? THEN ? ELSE rs2cs7 END,
+
+        rs3cs1 = CASE WHEN rd3cd1 = ? THEN ? ELSE rs3cs1 END,
+        rs3cs2 = CASE WHEN rd3cd2 = ? THEN ? ELSE rs3cs2 END,
+        rs3cs3 = CASE WHEN rd3cd3 = ? THEN ? ELSE rs3cs3 END,
+        rs3cs4 = CASE WHEN rd3cd4 = ? THEN ? ELSE rs3cs4 END,
+        rs3cs5 = CASE WHEN rd3cd5 = ? THEN ? ELSE rs3cs5 END,
+        rs3cs6 = CASE WHEN rd3cd6 = ? THEN ? ELSE rs3cs6 END,
+        rs3cs7 = CASE WHEN rd3cd7 = ? THEN ? ELSE rs3cs7 END,
+
+        rs4cs1 = CASE WHEN rd4cd1 = ? THEN ? ELSE rs4cs1 END,
+        rs4cs2 = CASE WHEN rd4cd2 = ? THEN ? ELSE rs4cs2 END,
+        rs4cs3 = CASE WHEN rd4cd3 = ? THEN ? ELSE rs4cs3 END,
+        rs4cs4 = CASE WHEN rd4cd4 = ? THEN ? ELSE rs4cs4 END,
+        rs4cs5 = CASE WHEN rd4cd5 = ? THEN ? ELSE rs4cs5 END,
+        rs4cs6 = CASE WHEN rd4cd6 = ? THEN ? ELSE rs4cs6 END,
+        rs4cs7 = CASE WHEN rd4cd7 = ? THEN ? ELSE rs4cs7 END,
+
+        rs5cs1 = CASE WHEN rd5cd1 = ? THEN ? ELSE rs5cs1 END,
+        rs5cs2 = CASE WHEN rd5cd2 = ? THEN ? ELSE rs5cs2 END,
+        rs5cs3 = CASE WHEN rd5cd3 = ? THEN ? ELSE rs5cs3 END,
+        rs5cs4 = CASE WHEN rd5cd4 = ? THEN ? ELSE rs5cs4 END,
+        rs5cs5 = CASE WHEN rd5cd5 = ? THEN ? ELSE rs5cs5 END,
+        rs5cs6 = CASE WHEN rd5cd6 = ? THEN ? ELSE rs5cs6 END,
+        rs5cs7 = CASE WHEN rd5cd7 = ? THEN ? ELSE rs5cs7 END
+      WHERE dep = ? 
+        AND sem = ?;
+    `;
+
+    const params = [];
+    for (let i = 0; i < 35; i++) {
+      params.push(courseCode, staffCode);
+    }
+    params.push(Department, Sem);
+
+    await db.promise().query(query, params);
+
+    
+    await db.promise().commit();
+
+    return res.status(200).json({ 
+      success: true, 
+      message: "Course and timetable updated successfully" 
+    });
+
   } catch (error) {
+    
+    try {
+      await db.promise().rollback();
+    } catch (rollbackError) {
+      console.error("Error during rollback:", rollbackError);
+    }
+    
     console.error("Error in /updatecourse:", error);
-    next(error);
     return res.status(500).json({ emessage: "Server error" });
   }
 });
+
+
 //-------------------------------------------------------------------------------
 
 router.get("/coursecodesug", async (req, res) => {
@@ -389,7 +476,7 @@ router.get("/coursecodesug", async (req, res) => {
 
 router.post("/addtimetable", async (req, res) => {
   try {
-    const timetable = req.body;
+    const {timetable} = req.body;
     const db = req.db;
 
     
@@ -460,5 +547,97 @@ router.get("/gettimetable", async (req, res, next) => {
     return res.status(500).json({ emessage: "Server Error" });
   }
 });
+
+//-------------------------------------------------------------------------------
+router.put("/updatetimetable", async (req, res,next) => {
+  try {
+    const { timetable, id } = req.body;
+    const db = req.db;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        emessage: "Missing timetable ID for update",
+      });
+    }
+
+    
+    for (const [key, value] of Object.entries(timetable)) {
+      if (value === null || value === undefined || value === "") {
+        return res.status(203).json({
+          success: false,
+          emessage: `Missing or empty value for field: ${key}`,
+        });
+      }
+    }
+
+    const keys = Object.keys(timetable);
+    const values = Object.values(timetable);
+
+    const setClause = keys.map((key) => `${key} = ?`).join(", ");
+    const query = `UPDATE timetable SET ${setClause} WHERE id = ?`;
+
+    values.push(id);
+
+    await db.promise().execute(query, values);
+
+    return res.status(200).json({
+      success: true,
+      message: "Timetable updated successfully",
+    });
+  } catch (err) {
+    console.error("Error updating timetable:", err);
+    next(err);
+    return res.status(500).json({
+      success: false,
+      emessage: "Failed to update timetable",
+    });
+  }
+});
+
+//-------------------------------------------------------------------------------
+
+router.get("/timetable/filter", async (req, res, next) => {
+  const db = req.db;
+  const { dep, hall_no, sem, division } = req.query;
+
+  try {
+    let query = "SELECT * FROM timetable WHERE 1=1";
+    let params = [];
+
+    if (dep) {
+      query += " AND dep LIKE ?";
+      params.push(`%${dep}%`);
+    }
+
+    if (hall_no) {
+      query += " AND hall_no LIKE ?";
+      params.push(`%${hall_no}%`);
+    }
+
+    if (sem) {
+      query += " AND sem = ?";
+      params.push(Number(sem));
+    }
+
+    if (division) {
+      query += " AND division LIKE ?";
+      params.push(`%${division}%`);
+    }
+
+    const [timetables] = await db.promise().query(query, params);
+
+    if (timetables.length < 1) {
+      return res.status(203).json({ emessage: "No timetables found" });
+    }
+
+    return res.status(200).json({ success: true, timetables });
+  } catch (error) {
+    console.error("Error in /timetable/filter:", error);
+    next(error);
+    return res.status(500).json({ emessage: "Server error" });
+  }
+});
+//-------------------------------------------------------------------------------
 
 module.exports = router;

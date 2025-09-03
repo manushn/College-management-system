@@ -1,7 +1,9 @@
 .admin-timetable-main{
     display: flex;
     flex-direction: column;
+    height: 80vh;
 }
+
 .admin-timetable-head{
     display: flex;
     align-items: center;
@@ -9,7 +11,9 @@
     padding-left: 1%;
     padding-right: 7%;
     border-bottom: 1px solid rgb(211, 211, 211);
+    flex-shrink: 0; 
 }
+
 .admin-timetable-head button{
     color: black;
     background-color: white;
@@ -17,61 +21,74 @@
     padding: 5px;
     border-radius: 5px;
 }
+
 .admin-timetable-head button:hover{
     background-color: black;
     color: white;
     cursor: pointer;
 }
+
 .admin-timetable-body{
+    flex: 1; 
+    overflow-y: auto; 
+    overflow-x: auto; 
     margin-right: 4%;
-    margin-bottom: 10%;
-    height: 100vh;
-    
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
+}
+.admin-timetable-body::-webkit-scrollbar {
+    display: none; 
 }
 .admin-timetable-add-main{
+    height: 100%; 
     overflow-x: auto;   
-     overflow-y: auto; 
+    overflow-y: auto; 
 }
+
 .adminmanagent-tablecard {
-  padding: 10px;  
-  
-  
-}
-.admin-timetable-add-main{
-    height: 75vh;
-    margin-bottom: 10%;
+    padding: 10px;  
 }
 
 .timetable-table {
-  border-collapse: collapse;
-  min-width: 1100px; 
-  width: 100%;
+    border-collapse: collapse;
+    min-width: 1100px; 
+    width: 100%;
 }
 
 .timetable-table th,
 .timetable-table td {
-  border: 1px solid #ccc;
-  padding: 6px;
-  text-align: center;
-  white-space: nowrap; /* keeps content in one line */
+    border: 1px solid #ccc;
+    padding: 6px;
+    text-align: center;
+    justify-content: center;
+    white-space: nowrap;
+    
 }
+
 .timetable-table tbody tr td div input{
     width: 55px;
     text-align: center;
     padding: 5px;
-    margin-bottom: 2px;
     border: 1px solid rgb(211, 211, 211);
     border-radius: 5px;
     font-weight: bold;
     color: #2c6adb;
-
 }
+
 .timetable-table tbody tr td div input:focus{
     outline: none;
 }
+.timetable-table tbody tr td div h4{
+    color: #2c6adb;
+    padding: 0;
+    margin-top:8px;
+    margin-bottom: 0;
+}
+
 .timetable-head p{
     margin-left: 7px;
 }
+
 .timetable-head select{
     width: 120px;
     margin-left: 5px;
@@ -83,29 +100,34 @@
 
 .timetable-head input{
     margin-left: 5px;
-     border: 1px solid rgb(177, 177, 177);
+    border: 1px solid rgb(177, 177, 177);
     border-radius: 5px;
     padding: 5px;
 }
+
 .addtimetable-btn{
     display: flex;
     justify-content: space-between;
     width: 250px;
     margin-left: 20px;
 }
+
 .addtimetable-btn button:first-child {
-  background-color: green;
-  color: white;
+    background-color: green;
+    color: white;
 }
+
 .addtimetable-btn button:first-child:hover{
     background-color: white;
     border: 1px solid green;
     color: green;
 }
+
 .addtimetable-btn button:last-child {
-  background-color: red;
-  color: white;
+    background-color: red;
+    color: white;
 }
+
 .addtimetable-btn button:last-child:hover{
     background-color: white;
     border: 1px solid red;
@@ -113,53 +135,54 @@
 }
 
 .suggesionpopup-main {
-  position: absolute; 
-  width: 100%;
-  display: flex;
-  justify-content: center;
+    position: absolute; 
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 .suggesionpopup-box {
-  position: absolute;
-  width: 350px;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  max-height: 200px;
-  overflow-y: auto;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
-  display: flex;
-  flex-direction: column;
- 
+    position: absolute;
+    width: 350px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
 }
+
 .suggesionpopup-box button {
     margin-top: 5px;
     margin-right: 5px;
-  align-self: flex-end;
-  color: red;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  background-color: white;
-  transition: background 0.2s ease-in-out;
+    align-self: flex-end;
+    color: red;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    background-color: white;
+    transition: background 0.2s ease-in-out;
 }
 
 .suggesionpopup-con p {
-  padding: 8px 12px;
-  margin: 0;
-  cursor: pointer;
-  transition: background 0.2s;
-  border-bottom: 1px solid rgb(241, 241, 241);
+    padding: 8px 12px;
+    margin: 0;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-bottom: 1px solid rgb(241, 241, 241);
 }
 
 .suggesionpopup-con p:hover {
-  background: #f5f5f5;
+    background: #f5f5f5;
 }
 
 
 .timetable-view-admin-main{
     display: flex;
     flex-direction: column;
+    height: 100%; 
     margin-left: 1%;
 }
 
@@ -173,10 +196,14 @@
     box-shadow: 1px 1px 1px rgb(217, 216, 216);
     border-radius: 5px;
     overflow-x: auto;
+    flex-shrink: 0; 
+    margin-bottom: 10px; 
 }
+
 .timetable-view-filter p{
     margin-right: 30px;
 }
+
 .timetable-view-filter select{
     border: 1px solid rgb(194, 194, 194);
     padding: 5px;
@@ -185,9 +212,11 @@
     border-radius: 5px;
     background-color: white;
 }
+
 .timetable-view-filter select:focus{
     outline: none;
 }
+
 .timetable-view-filter input{
     border: 1px solid rgb(194, 194, 194);
     padding: 5px;
@@ -195,15 +224,40 @@
     width: 150px;
     border-radius: 5px;
 }
+
 .timetable-view-filter input:focus{
     outline: none;
 }
+.timetable-view-filter button{
+    background-color: white;
+    color: red;
+    border: 1px solid red;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.timetable-add-btn{
+    flex-shrink: 0; 
+    margin-top: 10px;
+}
+.timetable-view-head{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+}
+
 .timetable-add-btn button{
     background-color: green;
     color: white;
     padding: 7px;
     border: none;
     border-radius: 5px;
-    margin-left: 10px;
+   
+    cursor: pointer;
 }
-
+.timetable-add-btn button:hover{
+    color: green;
+    border:1px solid green;
+    background-color: white;
+}
