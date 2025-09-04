@@ -269,7 +269,11 @@ const handleEdit=(dep)=>{
           <>
           <div className="admi-dep-table">
             <div className="adminmanagent-card">
-            <h3>Departments</h3>
+              <div className="adminmanagement-card-head">
+                  <h3>Departments</h3>
+                  <button onClick={()=>{setShowAdd(true)}}>Add Department</button>
+              </div>
+            
             <table className="card-table">
               <thead>
                 <tr>
@@ -302,7 +306,7 @@ const handleEdit=(dep)=>{
                 )}
               </tbody>
             </table>
-            <button onClick={()=>{setShowAdd(true)}}>Add Department</button>
+           
           </div>
           
 

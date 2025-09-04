@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 const multer = require("multer");
 const path = require("path");
 
+const fs = require("fs");
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, "../../uploads"));
@@ -98,7 +100,7 @@ router.post("/addstaff", upload.single("photo"), async (req, res) => {
    
     const insertStaffQuery = `
       INSERT INTO staff (
-        username, prefix, first_name, last_name, gender, date_of_birth,staff_code
+        username, prefix, first_name, last_name, gender, date_of_birth,staff_code,
         photo_url, phone_number, email, personal_email, address, city, state, pincode,
         emergency_contact_name, emergency_contact_number, designation, department,
         role_type, employment_type, reporting_manager, staff_status, aadhar_number,

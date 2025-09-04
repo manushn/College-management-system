@@ -190,3 +190,10 @@ body {
   background-color: red;
   color: white;
 }
+.adminmanagement-card-head{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-right: 5%;
+  margin-bottom: 5%;
+}
