@@ -45,8 +45,10 @@ input[type="number"] {
 .admin-addstaff-form form select,
 .admin-addstaff-form form textarea {
   width: 100%; 
-  padding: 10px;
+  padding: 6px;
   box-sizing: border-box;
+  border: none;
+  cursor: pointer;
 }
 
 .admin-addstaff-form form textarea {
@@ -70,6 +72,18 @@ input[type="number"] {
     background-color: green;
     color: white;
 }
+.admin-staff-add-col{
+  border: 1px solid grey;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid rgb(168, 167, 167);
+}
+.admin-staff-add-col p{
+  padding: 0;
+  margin: 0;
+  color: grey;
+  font-size: 14px;
+}
 
 @media (max-width: 768px) {
   .admin-addstaff-form form {
@@ -79,8 +93,13 @@ input[type="number"] {
   display: flex;
   flex-direction: column;
   height: 75vh;
+  }
+  .admin-staff-add-col p{
+  font-size: 10px;
 }
 }
+
+
 
 
 @media (min-width: 1024px) {

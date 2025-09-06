@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
-import path from "path";
 
 import "./css/addstaff.css";
-
 import defaultImg from "../../../assets/default-user.png";
 
-function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
+function AddStaff({ setStaffAdd, setEmessage, setMessage }) {
   const Token = localStorage.getItem("Token");
 
   const emptyState = {
@@ -17,7 +15,7 @@ function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
     date_of_birth: "",
     phone_number: "",
     email: "",
-    staff_code:"",
+    staff_code: "",
     personal_email: "",
     address: "",
     city: "",
@@ -40,7 +38,7 @@ function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
     highest_qualification: "",
     specialization: "",
     role: "",
-    joining_date:""
+    joining_date: ""
   };
 
   const [staffData, setStaffData] = useState(emptyState);
@@ -148,11 +146,10 @@ function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
       setEmessage("Enter a valid emergency contact number (10 digits)");
       return;
     }
-    if(!TestAadhar(staffData.aadhar_number)){
-      setEmessage("Enter a valid Aadhar Number")
+    if (!TestAadhar(staffData.aadhar_number)) {
+      setEmessage("Enter a valid Aadhar Number");
       return;
     }
-
 
     try {
       setSubmitting(true);
@@ -163,11 +160,7 @@ function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
       }
 
       Object.keys(staffData).forEach((key) => {
-        if (staffData[key] !== undefined && staffData[key] !== null) {
-          formData.append(key, staffData[key].toString());
-        } else {
-          formData.append(key, "");
-        }
+        formData.append(key, staffData[key] ?? "");
       });
 
       const response = await axios.post(
@@ -199,13 +192,14 @@ function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
     <div className="admin-addstaff-main">
       <div className="admin-addstaff-head">
         <h3>Add Staff</h3>
-        <button type="button" onClick={() => {setStaffAdd(false);}}>
+        <button type="button" onClick={() => setStaffAdd(false)}>
           Back
         </button>
       </div>
 
       <div className="admin-addstaff-form">
         <form onSubmit={handleSubmit}>
+          
           <div style={{ gridColumn: "1 / -1", display: "flex", gap: 12, alignItems: "center" }}>
             <div>
               <img
@@ -216,7 +210,7 @@ function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
                   height: 120,
                   objectFit: "cover",
                   borderRadius: 6,
-                  border: "1px solid #ddd"
+                  border: "1px solid #ddd",
                 }}
               />
             </div>
@@ -226,100 +220,223 @@ function AddStaff({ setStaffAdd ,setEmessage,setMessage}) {
                 accept="image/png, image/jpeg, image/jpg"
                 onChange={handleImageChange}
               />
-              <small>Allowed: JPG, JPEG, PNG. Max 2 MB. If not provided default image will be used.</small>
+              <small>Allowed: JPG, JPEG, PNG. Max 2 MB.</small>
             </div>
           </div>
 
-          <select name="prefix" value={staffData.prefix} onChange={handleSelectChange} required>
-            <option value="">Select Prefix</option>
-            <option value="Mr">MR</option>
-            <option value="Mrs">MRS</option>
-            <option value="Miss">MISS</option>
-          </select>
-          <input type="text" name="first_name" value={staffData.first_name} onChange={handleTextChange} placeholder="First Name" required />
-          <input type="text" name="last_name" value={staffData.last_name} onChange={handleTextChange} placeholder="Last Name" required />
-          <select name="gender" value={staffData.gender} onChange={handleSelectChange} required>
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-          <input
-            type={staffData.date_of_birth ? "date" : "text"}
-            name="date_of_birth"
-            value={staffData.date_of_birth}
-            onChange={handleTextChange}
-            onFocus={(e) => (e.target.type = "date")}
-            onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }}
-            placeholder="Date of Birth"
-            required
-          />
-          <input type="text" name="staff_code" value={staffData.staff_code} onChange={handleTextChange} placeholder="Staff_code" maxLength={4} required />
+          <div className="admin-staff-add-col">
+            <p>Prefix</p>
+            <select name="prefix" value={staffData.prefix} onChange={handleSelectChange} required>
+              <option value="">SELECT</option>
+              <option value="Mr">MR</option>
+              <option value="Mrs">MRS</option>
+              <option value="Miss">MISS</option>
+            </select>
+          </div>
 
-          <input type="text" inputMode="numeric" pattern="[0-9]*" name="phone_number" value={staffData.phone_number} onChange={handleNumberChange} placeholder="Phone Number" required />
-          <input type="email" name="email" value={staffData.email} onChange={handleemailChange} placeholder="Work Email" required />
-          <input type="email" name="personal_email" value={staffData.personal_email} onChange={handleemailChange} placeholder="Personal Email" required />
-          <textarea name="address" value={staffData.address} onChange={handleTextChange} placeholder="Address" required></textarea>
-          <input type="text" name="city" value={staffData.city} onChange={handleTextChange} placeholder="City" required />
-          <input type="text" name="state" value={staffData.state} onChange={handleTextChange} placeholder="State" required />
-          <input type="text" inputMode="numeric" pattern="[0-9]*" name="pincode" value={staffData.pincode} onChange={handleNumberChange} placeholder="Pincode" required />
-          <input type="text" name="emergency_contact_name" value={staffData.emergency_contact_name} onChange={handleTextChange} placeholder="Emergency Contact Name" required />
-          <input type="text" inputMode="numeric" pattern="[0-9]*" name="emergency_contact_number" value={staffData.emergency_contact_number} onChange={handleNumberChange} placeholder="Emergency Contact Number" required />
-          <input type="text" name="designation" value={staffData.designation} onChange={handleTextChange} placeholder="Designation" required />
-          <select name="department" value={staffData.department} onChange={handleSelectChange} required>
-            <option value="">Department</option>
-            <option value="ARTIFICIAL INTELLIGENCE AND DATA SCIENCE">ARTIFICIAL INTELLIGENCE AND DATA SCIENCE</option>
-            <option value="COMPUTER SCIENCE ENGINEERING">COMPUTER SCIENCE ENGINEERING</option>
-            <option value="INFORMATION TECHNOLOGY">INFORMATION TECHNOLOGY</option>
-            <option value="MECHANICAL ENGINEERING">MECHANICAL ENGINEERING</option>
-            <option value="ELECTRONICS AND COMMUNICATION ENGINEERING">ELECTRONICS AND COMMUNICATION ENGINEERING</option>
-            <option value="ELECTRICAL AND ELECTRONICS ENGINEERING">ELECTRICAL AND ELECTRONICS ENGINEERING</option>
-          </select>
-          <input type="text" name="role_type" value={staffData.role_type} onChange={handleTextChange} placeholder="Role Type" required />
-          <select name="employment_type" value={staffData.employment_type} onChange={handleSelectChange} required>
-            <option value="">Employment Type</option>
-            <option value="FullTime">Full Time</option>
-            <option value="PartTime">Part Time</option>
-            <option value="Contract">Contract</option>
-          </select>
-          <input type="text" name="reporting_manager" value={staffData.reporting_manager} onChange={handleTextChange} placeholder="Reporting Manager" required />
-          <select name="staff_status" value={staffData.staff_status} onChange={handleSelectChange} required>
-            <option value="">Staff Status</option>
-            <option value="active">Active</option>
-            <option value="leave">Leave</option>
-            <option value="resigned">Resigned</option>
-          </select>
-          <input type="text" inputMode="numeric" pattern="[0-9]*" name="aadhar_number" value={staffData.aadhar_number} onChange={handleNumberChange} placeholder="Aadhar Number" required />
-          <input type="text" name="pan_number" value={staffData.pan_number} onChange={handleTextChange} placeholder="PAN Number" required />
-          <input type="text" inputMode="numeric" pattern="[0-9]*" name="bank_account_number" value={staffData.bank_account_number} onChange={handleNumberChange} placeholder="Bank Account Number" required />
-          <input type="text" name="bank_name" value={staffData.bank_name} onChange={handleTextChange} placeholder="Bank Name" required />
-          <input type="text" name="ifsc_code" value={staffData.ifsc_code} onChange={handleTextChange} placeholder="IFSC Code" required />
-          <input type="text" inputMode="numeric" pattern="[0-9]*" name="salary" value={staffData.salary} onChange={handleNumberChange} placeholder="Salary" required />
-          <input type="text" name="highest_qualification" value={staffData.highest_qualification} onChange={handleTextChange} placeholder="Highest Qualification" required />
-          <input type="text" name="specialization" value={staffData.specialization} onChange={handleTextChange} placeholder="Specialization" required />
-          <input
-            type={staffData.joining_date ? "date" : "text"}
-            name="joining_date"
-            value={staffData.joining_date}
-            onChange={handleTextChange}
-            onFocus={(e) => (e.target.type = "date")}
-            onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }}
-            placeholder="JoiningDate"
-            required
-          />
-          <select name="role" value={staffData.role} onChange={handleSelectChange} required>
-            <option value="">Role</option>
-            <option value="staff">Staff</option>
-            <option value="head">Head</option>
-            <option value="admin">Admin</option>
+          <div className="admin-staff-add-col">
+            <p>First Name</p>
+            <input type="text" name="first_name" value={staffData.first_name} onChange={handleTextChange} required />
+          </div>
 
-          </select>
+          <div className="admin-staff-add-col">
+            <p>Last Name</p>
+            <input type="text" name="last_name" value={staffData.last_name} onChange={handleTextChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Gender</p>
+            <select name="gender" value={staffData.gender} onChange={handleSelectChange} required>
+              <option value="">SELECT</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Date Of Birth</p>
+            <input
+              type={staffData.date_of_birth ? "date" : "text"}
+              name="date_of_birth"
+              value={staffData.date_of_birth}
+              onChange={handleTextChange}
+              onFocus={(e) => (e.target.type = "date")}
+              onBlur={(e) => {
+                if (!e.target.value) e.target.type = "text";
+              }}
+              required
+            />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Staff Code</p>
+            <input type="text" name="staff_code" value={staffData.staff_code} onChange={handleTextChange} maxLength={4} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Phone Number</p>
+            <input type="text" inputMode="numeric" pattern="[0-9]*" name="phone_number" value={staffData.phone_number} onChange={handleNumberChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Work Email</p>
+            <input type="email" name="email" value={staffData.email} onChange={handleemailChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Personal Email</p>
+            <input type="email" name="personal_email" value={staffData.personal_email} onChange={handleemailChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Address</p>
+            <textarea name="address" value={staffData.address} onChange={handleTextChange} required></textarea>
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>City</p>
+            <input type="text" name="city" value={staffData.city} onChange={handleTextChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>State</p>
+            <input type="text" name="state" value={staffData.state} onChange={handleTextChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Pincode</p>
+            <input type="text" inputMode="numeric" pattern="[0-9]*" name="pincode" value={staffData.pincode} onChange={handleNumberChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Emergency Contact Name</p>
+            <input type="text" name="emergency_contact_name" value={staffData.emergency_contact_name} onChange={handleTextChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Emergency Contact Number</p>
+            <input type="text" inputMode="numeric" pattern="[0-9]*" name="emergency_contact_number" value={staffData.emergency_contact_number} onChange={handleNumberChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Designation</p>
+            <input type="text" name="designation" value={staffData.designation} onChange={handleTextChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Department</p>
+            <select name="department" value={staffData.department} onChange={handleSelectChange} required>
+              <option value="">SELECT</option>
+              <option value="ARTIFICIAL INTELLIGENCE AND DATA SCIENCE">ARTIFICIAL INTELLIGENCE AND DATA SCIENCE</option>
+              <option value="COMPUTER SCIENCE ENGINEERING">COMPUTER SCIENCE ENGINEERING</option>
+              <option value="INFORMATION TECHNOLOGY">INFORMATION TECHNOLOGY</option>
+              <option value="MECHANICAL ENGINEERING">MECHANICAL ENGINEERING</option>
+              <option value="ELECTRONICS AND COMMUNICATION ENGINEERING">ELECTRONICS AND COMMUNICATION ENGINEERING</option>
+              <option value="ELECTRICAL AND ELECTRONICS ENGINEERING">ELECTRICAL AND ELECTRONICS ENGINEERING</option>
+            </select>
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Role Type</p>
+            <input type="text" name="role_type" value={staffData.role_type} onChange={handleTextChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Employment Type</p>
+            <select name="employment_type" value={staffData.employment_type} onChange={handleSelectChange} required>
+              <option value="">SELECT</option>
+              <option value="FullTime">Full Time</option>
+              <option value="PartTime">Part Time</option>
+              <option value="Contract">Contract</option>
+            </select>
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Reporting Manager</p>
+            <input type="text" name="reporting_manager" value={staffData.reporting_manager} onChange={handleTextChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Staff Status</p>
+            <select name="staff_status" value={staffData.staff_status} onChange={handleSelectChange} required>
+              <option value="">SELECT</option>
+              <option value="active">Active</option>
+              <option value="leave">Leave</option>
+              <option value="resigned">Resigned</option>
+            </select>
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Aadhar Number</p>
+            <input type="text" inputMode="numeric" pattern="[0-9]*" name="aadhar_number" value={staffData.aadhar_number} onChange={handleNumberChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>PAN Number</p>
+            <input type="text" name="pan_number" value={staffData.pan_number} onChange={handleTextChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Bank Account Number</p>
+            <input type="text" inputMode="numeric" pattern="[0-9]*" name="bank_account_number" value={staffData.bank_account_number} onChange={handleNumberChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Bank Name</p>
+            <input type="text" name="bank_name" value={staffData.bank_name} onChange={handleTextChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>IFSC Code</p>
+            <input type="text" name="ifsc_code" value={staffData.ifsc_code} onChange={handleTextChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Salary</p>
+            <input type="text" inputMode="numeric" pattern="[0-9]*" name="salary" value={staffData.salary} onChange={handleNumberChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Highest Qualification</p>
+            <input type="text" name="highest_qualification" value={staffData.highest_qualification} onChange={handleTextChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Specialization</p>
+            <input type="text" name="specialization" value={staffData.specialization} onChange={handleTextChange} required />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Joining Date</p>
+            <input
+              type={staffData.joining_date ? "date" : "text"}
+              name="joining_date"
+              value={staffData.joining_date}
+              onChange={handleTextChange}
+              onFocus={(e) => (e.target.type = "date")}
+              onBlur={(e) => {
+                if (!e.target.value) e.target.type = "text";
+              }}
+              required
+            />
+          </div>
+
+          <div className="admin-staff-add-col">
+            <p>Role</p>
+            <select name="role" value={staffData.role} onChange={handleSelectChange} required>
+              <option value="">SELECT</option>
+              <option value="staff">Staff</option>
+              <option value="head">Head</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+
           <button type="submit" disabled={submitting}>
             {submitting ? "Saving..." : "Save Staff"}
           </button>
         </form>
       </div>
-
     </div>
   );
 }
