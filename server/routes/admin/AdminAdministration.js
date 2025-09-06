@@ -33,7 +33,7 @@ router.post("/adddep", async (req, res,next) => {
 
     return res.status(201).json({ message: "Department added successfully" ,success:true});
   } catch (error) {
-    console.error("Add dep error:", error);
+    
     next(error);
     return res.status(500).json({ emessage: "Server error"});
   }
@@ -50,7 +50,7 @@ router.get("/getdep", async (req, res,next) => {
     }
     return res.status(200).json({ departments, success: true });
   } catch (err) {
-    console.error("Error in Getdep:", err);
+    
     next(err)
     return res.status(500).json({ emessage: "Server error", error: err.message });
   }
@@ -77,7 +77,7 @@ router.get("/staffnamesug", async (req, res, next) => {
     return res.json({ suggestions });
 
   } catch (err) {
-    console.error("Error in staffnamesug:", err);
+    
     return res.status(500).json({ emessage: "Server error", error: err.message });
   }
 });
@@ -111,7 +111,7 @@ router.put("/editdep", async (req, res, next) => {
 
     return res.status(200).json({ message: "Department updated successfully", success: true });
   } catch (error) {
-    console.error("Edit dep error:", error);
+    
     next(error);
     return res.status(500).json({ emessage: "Server error" });
   }
@@ -135,7 +135,7 @@ router.get("/getcourses", async (req, res, next) => {
     if (firstCourse.length === 0) {
       return res.status(203).json({ 
         success: true,
-        courses: Courses || [],
+        courses: [],
     });
     }
 
@@ -155,7 +155,7 @@ router.get("/getcourses", async (req, res, next) => {
     });
 
   } catch (error) {
-    console.log("Error in Getcourses", error);
+    
     next(error);
     return res.status(500).json({ emessage: "Server Error" });
   }
@@ -225,7 +225,7 @@ router.post("/addcourse", async (req, res, next) => {
       courseId: result.insertId,
     });
   } catch (error) {
-    console.error("Error in /addcourse:", error.message);
+    
     return res.status(500).json({ emessage: "Server Error" });
   }
 });
@@ -259,7 +259,7 @@ router.get("/courses/filter", async (req, res, next) => {
 
     return res.status(200).json({ success: true, courses });
   } catch (error) {
-    console.error("Error in /courses/filter:", error);
+    
     next(error);
     return res.status(500).json({ emessage: "Server error" });
   }
@@ -287,7 +287,7 @@ router.get("/courses/search", async (req, res, next) => {
 
     return res.status(200).json({ success: true, courses });
   } catch (error) {
-    console.error("Error in /courses/search:", error);
+    
     next(error);
     return res.status(500).json({ emessage: "Server error" });
   }
@@ -436,10 +436,10 @@ router.put("/updatecourse/:id", async (req, res, next) => {
     try {
       await db.promise().rollback();
     } catch (rollbackError) {
-      console.error("Error during rollback:", rollbackError);
+      next(rollbackError)
     }
     
-    console.error("Error in /updatecourse:", error);
+    next(error)
     return res.status(500).json({ emessage: "Server error" });
   }
 });
@@ -447,7 +447,7 @@ router.put("/updatecourse/:id", async (req, res, next) => {
 
 //-------------------------------------------------------------------------------
 
-router.get("/coursecodesug", async (req, res) => {
+router.get("/coursecodesug", async (req, res,next) => {
   const db = req.db;
   const typedName = req.query.typedName || '';
 
@@ -468,13 +468,13 @@ router.get("/coursecodesug", async (req, res) => {
     return res.json({ courseCode: courses });
 
   } catch (err) {
-    console.error("Error in coursecodesug:", err);
+    next(err);
     return res.status(500).json({ emessage: "Server error", error: err.message });
   }
 });
 //-------------------------------------------------------------------------------
 
-router.post("/addtimetable", async (req, res) => {
+router.post("/addtimetable", async (req, res,next) => {
   try {
     const {timetable} = req.body;
     const db = req.db;
@@ -502,7 +502,7 @@ router.post("/addtimetable", async (req, res) => {
       
     });
   } catch (err) {
-    console.error("Error inserting timetable:", err);
+    next(err);
     res.status(500).json({ success: false, message: "Failed to save timetable" });
   }
 });
@@ -542,7 +542,7 @@ router.get("/gettimetable", async (req, res, next) => {
     });
 
   } catch (error) {
-    console.log("Error in GetTimetable:", error);
+   
     next(error);
     return res.status(500).json({ emessage: "Server Error" });
   }
@@ -586,7 +586,7 @@ router.put("/updatetimetable", async (req, res,next) => {
       message: "Timetable updated successfully",
     });
   } catch (err) {
-    console.error("Error updating timetable:", err);
+    
     next(err);
     return res.status(500).json({
       success: false,
@@ -633,7 +633,7 @@ router.get("/timetable/filter", async (req, res, next) => {
 
     return res.status(200).json({ success: true, timetables });
   } catch (error) {
-    console.error("Error in /timetable/filter:", error);
+    
     next(error);
     return res.status(500).json({ emessage: "Server error" });
   }

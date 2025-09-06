@@ -47,7 +47,7 @@ function AdminCourseManage({ setActiveTab, setEmessage, setMessage }) {
       setEmessage("Enter all Fields!");
       return;
     }
-    console.log(courseCode,CourseName,CourseType ,Credit,Department ,Depid,Staffname ,StaffId ,Sem ,Regulation)
+    
 
     try {
       setIsloading(true);
@@ -161,8 +161,7 @@ function AdminCourseManage({ setActiveTab, setEmessage, setMessage }) {
 
   const fetchcourses = async () => {
     const Token = localStorage.getItem("Token");
-    setfilterDep("");
-    setfilterSem("");
+    
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/admin/getcourses`,
@@ -327,6 +326,8 @@ const handleUpdate = async (e) => {
 
 
   useEffect(()=>{
+    if(IsAdd) return;
+
     if(filterDep){
 
     handleCourseFilter()
@@ -336,7 +337,7 @@ const handleUpdate = async (e) => {
     }
 
 
-  },[filterDep,filterSem])
+  },[filterDep,filterSem,IsAdd])
 
 useEffect(()=>{
   fetchdep()
@@ -348,6 +349,8 @@ useEffect(()=>{
 
   useEffect(() => {
     if (!IsAdd) {
+      if(filterDep) return;
+      
       fetchcourses();
     } else {
       fetchdep();
