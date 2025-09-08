@@ -7,7 +7,7 @@ import "./css/addstaff.css";
 import defaultImg from "../../../assets/default-user.png";
 
 function EditStaff({ selectedStaff ,setIsEditing,setEmessage,setMessage}) {
-  const Token = localStorage.getItem("Token");
+  const Token = sessionStorage.getItem("Token");;
 
   const emptyState = {
     prefix: "",

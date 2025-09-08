@@ -51,7 +51,7 @@ function AdminCourseManage({ setActiveTab, setEmessage, setMessage }) {
 
     try {
       setIsloading(true);
-      const Token = localStorage.getItem("Token");
+      const Token = sessionStorage.getItem("Token");;
 
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/admin/addcourse`,
@@ -110,7 +110,7 @@ function AdminCourseManage({ setActiveTab, setEmessage, setMessage }) {
         setnamesuggest([]);
         return;
       }
-      const Token = localStorage.getItem("Token");
+      const Token = sessionStorage.getItem("Token");;
 
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/admin/staffnamesug`,
@@ -134,7 +134,7 @@ function AdminCourseManage({ setActiveTab, setEmessage, setMessage }) {
   //--------------------------------------------------------------------------------------
 
   const fetchdep = async () => {
-    const Token = localStorage.getItem("Token");
+    const Token = sessionStorage.getItem("Token");;
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/admin/getdep`,
@@ -160,7 +160,7 @@ function AdminCourseManage({ setActiveTab, setEmessage, setMessage }) {
   //--------------------------------------------------------------------------------------
 
   const fetchcourses = async () => {
-    const Token = localStorage.getItem("Token");
+    const Token = sessionStorage.getItem("Token");;
     
     try {
       const response = await axios.get(
@@ -192,7 +192,7 @@ function AdminCourseManage({ setActiveTab, setEmessage, setMessage }) {
       return
     }
     try{
-      const Token = localStorage.getItem("Token");
+      const Token = sessionStorage.getItem("Token");;
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/admin/courses/filter`,
         {
@@ -233,7 +233,7 @@ function AdminCourseManage({ setActiveTab, setEmessage, setMessage }) {
   const handler = setTimeout(() => {
     const runSearch = async () => {
       try {
-        const Token = localStorage.getItem("Token");
+        const Token = sessionStorage.getItem("Token");;
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/admin/courses/search`,
           {
@@ -283,7 +283,7 @@ const handleUpdate = async (e) => {
 
   try {
     setIsloading(true);
-    const Token = localStorage.getItem("Token");
+    const Token = sessionStorage.getItem("Token");;
 
     const response = await axios.put(
       `${import.meta.env.VITE_BACKEND_URL}/admin/updatecourse/${courseId}`, // courseId must come from selected course

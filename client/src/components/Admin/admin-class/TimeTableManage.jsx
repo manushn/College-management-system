@@ -53,7 +53,7 @@ function TimeTableManage({setActiveTab,setEmessage,setMessage}) {
             if(StaffcodeSearch.length<1||StaffcodeSearch.length>3) return;
             
 
-            const Token = localStorage.getItem("Token");
+            const Token = sessionStorage.getItem("Token");;
 
             const response = await axios.get(
                   `${import.meta.env.VITE_BACKEND_URL}/admin/staffnamesug`,
@@ -91,7 +91,7 @@ const fetchCourseCode =async()=>{
 
             if(CoursecodeSearch.length<1||CoursecodeSearch.length>5) return;
 
-            const Token = localStorage.getItem("Token");
+            const Token = sessionStorage.getItem("Token");;
 
             const response = await axios.get(
                   `${import.meta.env.VITE_BACKEND_URL}/admin/coursecodesug`,
@@ -125,7 +125,7 @@ useEffect(() => {
 //-------------------------------------------------------------------------------
 
   const fetchdep = async () => {
-    const Token = localStorage.getItem("Token");
+    const Token = sessionStorage.getItem("Token");;
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/admin/getdep`,
@@ -170,7 +170,7 @@ const handleSubmit = async () => {
     ...timetable,
     wef: timetable.wef ? timetable.wef.split('T')[0] : null
   };
-  const Token = localStorage.getItem("Token");
+  const Token = sessionStorage.getItem("Token");;
 
   try {
     const response = await axios.post(
@@ -199,7 +199,7 @@ const handleSubmit = async () => {
 };
 //-------------------------------------------------------------------------------
 const fetchtimetable = async () => {
-    const Token = localStorage.getItem("Token");
+    const Token = sessionStorage.getItem("Token");;
     try {
       setIsloading(true);
       const response = await axios.get(
@@ -225,13 +225,7 @@ const fetchtimetable = async () => {
     }
   };
 
-//-------------------------------------------------------------------------------
-  useEffect(()=>{
-      
-      fetchdep();
-      fetchtimetable();
 
-  },[IsAdd])
 //-------------------------------------------------------------------------------
 
 const handleEdit = (index) => {
@@ -321,11 +315,6 @@ const handleEdit = (index) => {
 //-------------------------------------------------------------------------------
 
 const resetForm = () => {
-    setEditTableid("");
-    setfilterdep("");
-    setfilterdiv("1");
-    setfilterhallno("");
-    setfiltersem("");
     setTimetable({
         dep: "",
         sem: "",
@@ -359,7 +348,7 @@ const handleEditSubmit = async () => {
     wef: timetable.wef ? timetable.wef.split('T')[0] : null
   };
 
-    const Token = localStorage.getItem("Token");
+    const Token = sessionStorage.getItem("Token");;
 
     try {
         const response = await axios.put(
@@ -436,10 +425,11 @@ useEffect(()=>{
   }
   if(filterdep.length<1&&filtersem.length<1&&filterhallno.length<1&&filterdiv.length>0){
     fetchtimetable()
+    fetchdep();
   }
 
 
-},[filterdep,filtersem,filterdiv,filterhallno])
+},[filterdep,filtersem,filterdiv,filterhallno,IsAdd])
 
 
 
@@ -543,7 +533,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd1cd1: value });
+                                          setTimetable({ ...timetable, rs1cs1: "",rd1cd1: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd1cd1')
                                           setCurrentstaffposition('rs1cs1')
@@ -561,10 +551,10 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd1cd2: value });
+                                          setTimetable({ ...timetable, rs1cs2:"",rd1cd2: value });
                                           setCoursecodeSearch(value);
-                                          setCurrentposition('rd1cd2')
-                                          setCurrentstaffposition('rs1cs2')
+                                          setCurrentposition('rd1cd2');
+                                          setCurrentstaffposition('rs1cs2');
                               }}/>
                           </div>
                           <div><h4>{timetable.rs1cs2} </h4>
@@ -581,7 +571,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd1cd3: value });
+                                          setTimetable({ ...timetable, rs1cs3:"",rd1cd3: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd1cd3')
                                           setCurrentstaffposition('rs1cs3')
@@ -599,7 +589,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd1cd4: value });
+                                          setTimetable({ ...timetable,rs1cs4:"", rd1cd4: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd1cd4')
                                           setCurrentstaffposition('rs1cs4')
@@ -617,7 +607,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd1cd5: value });
+                                          setTimetable({ ...timetable,rs1cs5:"", rd1cd5: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd1cd5')
                                           setCurrentstaffposition('rs1cs5')
@@ -634,7 +624,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd1cd6: value });
+                                          setTimetable({ ...timetable,rs1cs6:"", rd1cd6: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd1cd6')
                                           setCurrentstaffposition('rs1cs6')
@@ -652,7 +642,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd1cd7: value });
+                                          setTimetable({ ...timetable,rs1cs7:"", rd1cd7: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd1cd7')
                                           setCurrentstaffposition('rs1cs7')
@@ -672,7 +662,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd2cd1: value });
+                                          setTimetable({ ...timetable,rs2cs1:"", rd2cd1: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd2cd1')
                                           setCurrentstaffposition('rs2cs1')
@@ -689,7 +679,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd2cd2: value });
+                                          setTimetable({ ...timetable,rs2cs2:"", rd2cd2: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd2cd2')
                                           setCurrentstaffposition('rs2cs2')
@@ -707,7 +697,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd2cd3: value });
+                                          setTimetable({ ...timetable,rs2cs3:"", rd2cd3: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd2cd3')
                                           setCurrentstaffposition('rs2cs3')
@@ -724,7 +714,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd2cd4: value });
+                                          setTimetable({ ...timetable,rs2cs4:"", rd2cd4: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd2cd4')
                                           setCurrentstaffposition('rs2cs4')
@@ -742,7 +732,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd2cd5: value });
+                                          setTimetable({ ...timetable,rs2cs5:"", rd2cd5: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd2cd5')
                                           setCurrentstaffposition('rs2cs5')
@@ -759,7 +749,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd2cd6: value });
+                                          setTimetable({ ...timetable,rs2cs6:"", rd2cd6: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd2cd6')
                                           setCurrentstaffposition('rs2cs6')
@@ -777,7 +767,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd2cd7: value });
+                                          setTimetable({ ...timetable,rs2cs7:"", rd2cd7: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd2cd7')
                                           setCurrentstaffposition('rs2cs7')
@@ -798,7 +788,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd3cd1: value });
+                                          setTimetable({ ...timetable,rs3cs1:"", rd3cd1: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd3cd1')
                                           setCurrentstaffposition('rs3cs1')
@@ -815,7 +805,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd3cd2: value });
+                                          setTimetable({ ...timetable,rs3cs2:"", rd3cd2: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd3cd2')
                                           setCurrentstaffposition('rs3cs2')
@@ -833,7 +823,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd3cd3: value });
+                                          setTimetable({ ...timetable,rs3cs3:"", rd3cd3: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd3cd3')
                                           setCurrentstaffposition('rs3cs3')
@@ -850,7 +840,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd3cd4: value });
+                                          setTimetable({ ...timetable,rs3cs4:"", rd3cd4: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd3cd4')
                                           setCurrentstaffposition('rs3cs4')
@@ -868,7 +858,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd3cd5: value });
+                                          setTimetable({ ...timetable,rs3cs5:"", rd3cd5: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd3cd5')
                                           setCurrentstaffposition('rs3cs5')
@@ -885,7 +875,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd3cd6: value });
+                                          setTimetable({ ...timetable,rs3cs6:"", rd3cd6: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd3cd6')
                                           setCurrentstaffposition('rs3cs6')
@@ -903,7 +893,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd3cd7: value });
+                                          setTimetable({ ...timetable,rs3cs7:"", rd3cd7: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd3cd7')
                                           setCurrentstaffposition('rs3cs7')
@@ -924,7 +914,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd4cd1: value });
+                                          setTimetable({ ...timetable,rs4cs1:"", rd4cd1: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd4cd1')
                                           setCurrentstaffposition('rs4cs1')
@@ -941,7 +931,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd4cd2: value });
+                                          setTimetable({ ...timetable,rs4cs2:"", rd4cd2: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd4cd2')
                                           setCurrentstaffposition('rs4cs2')
@@ -959,7 +949,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd4cd3: value });
+                                          setTimetable({ ...timetable,rs4cs3:"", rd4cd3: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd4cd3')
                                           setCurrentstaffposition('rs4cs3')
@@ -976,7 +966,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd4cd4: value });
+                                          setTimetable({ ...timetable,rs4cs4:"", rd4cd4: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd4cd4')
                                           setCurrentstaffposition('rs4cs4')
@@ -994,7 +984,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd4cd5: value });
+                                          setTimetable({ ...timetable,rs4cs5:"", rd4cd5: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd4cd5')
                                           setCurrentstaffposition('rs4cs5')
@@ -1011,7 +1001,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd4cd6: value });
+                                          setTimetable({ ...timetable,rs4cs6:"", rd4cd6: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd4cd6')
                                           setCurrentstaffposition('rs4cs6')
@@ -1029,7 +1019,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd4cd7: value });
+                                          setTimetable({ ...timetable,rs4cs7:"", rd4cd7: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd4cd7')
                                           setCurrentstaffposition('rs4cs7')
@@ -1049,7 +1039,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd5cd1: value });
+                                          setTimetable({ ...timetable,rs5cs1:"", rd5cd1: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd5cd1')
                                           setCurrentstaffposition('rs5cs1')
@@ -1066,7 +1056,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd5cd2: value });
+                                          setTimetable({ ...timetable,rs5cs2:"", rd5cd2: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd5cd2')
                                           setCurrentstaffposition('rs5cs2')
@@ -1084,7 +1074,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd5cd3: value });
+                                          setTimetable({ ...timetable,rs5cs3:"", rd5cd3: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd5cd3')
                                           setCurrentstaffposition('rs5cs3')
@@ -1101,7 +1091,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd5cd4: value });
+                                          setTimetable({ ...timetable,rs5cs4:"", rd5cd4: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd5cd4')
                                           setCurrentstaffposition('rs5cs4')
@@ -1119,7 +1109,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd5cd5: value });
+                                          setTimetable({ ...timetable,rs5cs5:"", rd5cd5: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd5cd5')
                                           setCurrentstaffposition('rs5cs5')
@@ -1136,7 +1126,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd5cd6: value });
+                                          setTimetable({ ...timetable,rs5cs6:"", rd5cd6: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd5cd6')
                                           setCurrentstaffposition('rs5cs6')
@@ -1154,7 +1144,7 @@ useEffect(()=>{
                                 maxLength={6}
                                 onChange={(e) => {
                                           const value = e.target.value.toUpperCase().trim();
-                                          setTimetable({ ...timetable, rd5cd7: value });
+                                          setTimetable({ ...timetable, rs5cs7:"",rd5cd7: value });
                                           setCoursecodeSearch(value);
                                           setCurrentposition('rd5cd7')
                                           setCurrentstaffposition('rs5cs7')

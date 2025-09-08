@@ -26,64 +26,6 @@ function Loginpages() {
         }
     }, [Emessage]);
 
-useEffect(()=>{
-
-  const autologin=async()=>{
-    try{
-      const Token=localStorage.getItem("Token");
-
-      if(!Token) return;
-
-      const response= await axios.post(`${import.meta.env.VITE_BACKEND_URL}/autologin`,
-          {Token},
-          {
-            headers: {
-              Authorization: `Bearer ${Token}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-      
-      if(response.data.success){
-         localStorage.setItem("Token",response.data.Token);
-         sessionStorage.setItem("isLoggedin",true)
-         sessionStorage.setItem("role",response.data.role);
-          const role=response.data.role;
-          console.log("Role from autologin",role)
-          if(role==="admin"){
-            navigate('/admin-home')
-          }else if(role==='head'){
-            navigate('/head-home')
-          }else if(role==='accountant'){
-            navigate('/accountant-home')
-          }else if(role==='student'){
-            navigate('/student-home')
-          }else if(role==='staff'){
-            navigate('/staff-home')
-          }
-          else{
-            console.log("Navigating to login from auto login")
-            
-            localStorage.removeItem("Token")
-            sessionStorage.removeItem("isLoggedin")
-            sessionStorage.removeItem('role');
-            navigate('login');
-          }
-      }
-
-      
-
-
-    }catch(error){
-      console.log(error)
-    }finally{setIsloading(false)}
-  }
-  autologin()
-
-},[])
-
-    
-    
 
       const handleLogin = async(e)=>{
        e.preventDefault();
@@ -101,7 +43,7 @@ useEffect(()=>{
         }
 
         if(response.data.success){
-          localStorage.setItem("Token",response.data.token);
+          sessionStorage.setItem("Token",response.data.token);
           sessionStorage.setItem("isLoggedin",true)
           sessionStorage.setItem("role",response.data.role);
           const role=response.data.role;
@@ -120,7 +62,7 @@ useEffect(()=>{
           else{
             console.log("Navigating to login from login")
             
-            localStorage.removeItem("Token")
+            sessionStorage.removeItem("Token");
             sessionStorage.removeItem("isLoggedin")
             sessionStorage.removeItem('role');
             navigate('login');

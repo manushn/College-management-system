@@ -9,7 +9,7 @@ function HeadHome() {
       if(Role!=='head'){
         alert("Invalid Access Dedected Redirecting...")
         
-        localStorage.removeItem("Token");
+        sessionStorage.removeItem("Token");;
         sessionStorage.removeItem('role');
         sessionStorage.removeItem('isLoggedin')
         navigate("/login", { replace: true });

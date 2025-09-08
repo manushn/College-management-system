@@ -7,10 +7,11 @@ const mysqlPromise = require('mysql2/promise');
 const path = require('path');
 const logger = require('./logger');
 const schemas = require('./Schemas/Schemas');
+const Fingerprint = require('express-fingerprint');
 
 const port = 4000;
 
-// Routes & middleware
+
 const login = require("./routes/Login");
 const AdminStaff = require("./routes/admin/AdminStaff");
 const Createpassword = require("./routes/Createpassword");
@@ -21,7 +22,7 @@ dotenv.config();
 app.use(cors());
 app.use(express.json());
 
-// --- Database setup and ensure schema ---
+
 (async () => {
   try {
     
@@ -70,6 +71,13 @@ app.use(express.json());
       next();
     });
 
+  app.use(Fingerprint({
+    parameters: [
+      Fingerprint.useragent,
+      Fingerprint.acceptHeaders,
+      Fingerprint.geoip
+    ]
+  }));
     
     app.use("/uploads", express.static(path.join(__dirname, "uploads")));
     app.use("/", login);

@@ -50,7 +50,7 @@ function AdminDepManage({setActiveTab,setEmessage,setMessage}) {
           return
         }
 
-        const Token =localStorage.getItem("Token")
+        const Token =sessionStorage.getItem("Token");
 
       if(Isedit){
         const response = await axios.put(
@@ -109,7 +109,7 @@ function AdminDepManage({setActiveTab,setEmessage,setMessage}) {
       setnamesuggest([]);
       return
     }
-    const Token = localStorage.getItem("Token");
+    const Token = sessionStorage.getItem("Token");;
 
     const response = await axios.get(
       `${import.meta.env.VITE_BACKEND_URL}/admin/staffnamesug`,
@@ -133,7 +133,7 @@ function AdminDepManage({setActiveTab,setEmessage,setMessage}) {
 
 //-------------------------------------------------------------------------------
 const fetchdep=async()=>{
-    const Token=localStorage.getItem("Token");
+    const Token=sessionStorage.getItem("Token");;
       try{
           const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/admin/getdep`,

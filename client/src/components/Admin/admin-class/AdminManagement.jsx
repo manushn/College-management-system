@@ -17,7 +17,7 @@ function AdminManagement({setActiveTab,setEmessage,setMessage}) {
 //-------------------------------------------------------------------------------
 
   const fetchdep=async()=>{
-    const Token=localStorage.getItem("Token");
+    const Token=sessionStorage.getItem("Token");;
       try{
           const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/admin/getdep`,
@@ -43,7 +43,7 @@ function AdminManagement({setActiveTab,setEmessage,setMessage}) {
 //-------------------------------------------------------------------------------
 
   const fetchcourses = async () => {
-    const Token = localStorage.getItem("Token");
+    const Token = sessionStorage.getItem("Token");;
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/admin/getcourses`,
@@ -68,7 +68,7 @@ function AdminManagement({setActiveTab,setEmessage,setMessage}) {
 //-------------------------------------------------------------------------------
 
   const fetchtimetable = async () => {
-    const Token = localStorage.getItem("Token");
+    const Token = sessionStorage.getItem("Token");;
     try {
       setTableLoading(true);
       const response = await axios.get(

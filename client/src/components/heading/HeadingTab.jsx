@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 function HeadingTab() {
 const navigate =useNavigate();
-const token=localStorage.getItem("Token");
+const token=sessionStorage.getItem("Token");;
 
   return (
     <>
@@ -15,7 +15,7 @@ const token=localStorage.getItem("Token");
         {
           token&&(
               <div className="headtab-right">
-                  <button onClick={()=>{localStorage.removeItem("Token");navigate("/login")}}>Logout</button>
+                  <button onClick={()=>{sessionStorage.removeItem("Token");;navigate("/login")}}>Logout</button>
               </div>
           )
         }

@@ -8,7 +8,7 @@ function AdminStaffView({ setEmessage ,SearchStaff,setMessage}) {
   const [Staffdetails, setStaffdetails] = useState([]);
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  const Token = localStorage.getItem("Token");
+  const Token = sessionStorage.getItem("Token");;
   const [selectedStaff, setSelectedStaff] = useState("");
   const [isEditing, setIsEditing] = useState(false); 
 
