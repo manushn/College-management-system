@@ -226,8 +226,8 @@ const getFilteredStaff=async()=>{
                     alt="Staff Photo"
                   />
                 </div>
-
-                <p>
+                <div className="staff-details-body-con-deta">
+                    <p>
                   <b>Name:</b> {Staffdetails[0].prefix}.{" "}
                   {Staffdetails[0].first_name} {Staffdetails[0].last_name}
                 </p>
@@ -272,7 +272,7 @@ const getFilteredStaff=async()=>{
                 <p>
                   <b>Reporting Staff:</b> {Staffdetails[0].reporting_manager}
                 </p>
-                <br></br>
+                
                 <p>
                   <b>Emergency Contacter Name:</b>{" "}
                   {Staffdetails[0].emergency_contact_name}
@@ -293,7 +293,7 @@ const getFilteredStaff=async()=>{
                 <p>
                   <b>Pincode:</b> {Staffdetails[0].pincode}
                 </p>
-                <br />
+                
 
                 <p>
                   <b>Aadhar Number:</b>
@@ -313,7 +313,7 @@ const getFilteredStaff=async()=>{
                 <p>
                   <b>IFSC Code:</b> {Staffdetails[0].ifsc_code}
                 </p>
-                <br />
+                
                 <p>
                   <b>Access Level:</b> {Staffdetails[0].role}
                 </p>
@@ -336,6 +336,9 @@ const getFilteredStaff=async()=>{
                       </p>
                     </>
                 )}
+                </div>
+                
+                
 
                 <div className="staff-details-body-con-btn">
                   <button onClick={() => setIsEditing(true)}>Edit</button>

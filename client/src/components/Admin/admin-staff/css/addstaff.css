@@ -62,15 +62,16 @@ input[type="number"] {
 } 
 
 .admin-addstaff-form form button{
-    background-color: white;
-    color: green;
+    background-color: green;
+    color: white;
     border: 1px solid green;
     border-radius: 10px;
     cursor: pointer;
 }
 .admin-addstaff-form form button:hover{
-    background-color: green;
-    color: white;
+    background-color: white;
+    color: green;
+    border: 1px solid green;
 }
 .admin-staff-add-col{
   border: 1px solid grey;

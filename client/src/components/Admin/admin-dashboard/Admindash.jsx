@@ -20,7 +20,7 @@ function Admindash() {
 
   
 useEffect(() => {
-    const token = localStorage.getItem('Token');
+    const token = sessionStorage.getItem('Token');
     if (!token) {
       navigate("/login", { replace: true });
     }
