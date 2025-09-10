@@ -21,9 +21,9 @@ const tokenVerify = (req, res, next) => {
       }
 
       
-      if (payload.fingerprint !== req.fingerprint?.hash||"") {
-        return res.status(203).json({ message: "Invalid fingerprint or token" });
-      }
+      //if (payload.fingerprint !== req.fingerprint?.hash||"") {
+     //   return res.status(203).json({ message: "Invalid fingerprint or token" });
+     // }
 
       req.tokendata = payload;
       next();

@@ -339,7 +339,7 @@ function EditStaff({ selectedStaff ,setIsEditing,setEmessage,setMessage}) {
 
           <div className="admin-staff-add-col">
             <p>Staff Code</p>
-            <input type="text" name="staff_code" value={staffData.staff_code} onChange={handleTextChange} maxLength={4} required />
+            <input type="text"  disabled={true} name="staff_code" value={staffData.staff_code} onChange={handleTextChange} maxLength={4} required />
           </div>
 
           <div className="admin-staff-add-col">
@@ -495,6 +495,7 @@ function EditStaff({ selectedStaff ,setIsEditing,setEmessage,setMessage}) {
             <select name="role" value={staffData.role} onChange={handleSelectChange} required>
               <option value="">SELECT</option>
               <option value="staff">Staff</option>
+              <option value="accountant">Accountant</option>
               <option value="head">Head</option>
               <option value="admin">Admin</option>
             </select>

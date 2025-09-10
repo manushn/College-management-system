@@ -32,6 +32,7 @@ function TimeTableManage({setActiveTab,setEmessage,setMessage}) {
 
   const [departments,setdepartments]=useState([]);
   const [Timetables,setTimetables]=useState([]);
+  const [TimetableDescribe,setTimetableDescribe]=useState([]);
 
   const [filterdep,setfilterdep]=useState("");
   const [filterhallno,setfilterhallno]=useState("");
@@ -216,7 +217,8 @@ const fetchtimetable = async () => {
         setTimetables([]);
       }
       if (response.data.success) {
-        setTimetables(response.data.timetable);
+        setTimetables(response.data.timetable.Timetable);
+        setTimetableDescribe(response.data.timetable.TimetableDescribe)
       }
     } catch (err) {
       console.log("Error in fetching dep:", err);
@@ -383,7 +385,7 @@ const fetchfilterTimetable=async()=>{
 try{
 
   if(filterdep.length<1&&filterdiv.length<1&&filterhallno.length<1&&filtersem.length<1) return;
-    const Token=localStorage.getItem('Token');
+    const Token=sessionStorage.getItem('Token');
     const response = await axios.get(
                   `${import.meta.env.VITE_BACKEND_URL}/admin/timetable/filter`,
                   {
@@ -401,6 +403,7 @@ try{
 );
  if (response.data.success){
   setTimetables(response.data.timetables);
+  setTimetableDescribe(response.data.TimetableDescribe)
  }else{
   setEmessage("No Timetable Available for your filter.")
   setTimetables([]);
@@ -1335,7 +1338,42 @@ useEffect(()=>{
   <div className="timetable-add-btn">
                   <button onClick={() => handleEdit(0)}>Edit Timetable</button>
 
-              </div>
+   </div>
+   <div className="timetable-description">
+    <div className="timetable-description-con">
+      <table>
+        <thead>
+          <tr>
+            <th>Course Code</th>
+            <th>Course Name</th>
+            <th>Staff Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          {TimetableDescribe.length>0?(
+            <>
+            {TimetableDescribe.map((confirm,index)=>(
+              <tr key={index}>
+                <td>{confirm.course_code}</td>
+                <td>{confirm.course_name}</td>
+                <td>{confirm.staff_name}</td>
+              </tr>
+            ))}
+            
+            </>
+          ):(
+            <>
+            <tr>
+              <td colSpan="5" style={{ textAlign: "center" }}>
+                        No details found.
+              </td>
+            </tr>
+            </>
+          )}
+        </tbody>
+      </table>
+    </div>
+   </div>
 
 </div>
             

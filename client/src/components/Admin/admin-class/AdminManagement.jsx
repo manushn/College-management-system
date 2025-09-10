@@ -85,7 +85,7 @@ function AdminManagement({setActiveTab,setEmessage,setMessage}) {
         setTimetables([]);
       }
       if (response.data.success) {
-        setTimetables(response.data.timetable);
+        setTimetables(response.data.timetable.Timetable);
       }
     } catch (err) {
       console.log("Error in fetching dep:", err);

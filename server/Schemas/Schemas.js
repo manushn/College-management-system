@@ -42,7 +42,7 @@ const schemas = {
       highest_qualification VARCHAR(100),
       specialization VARCHAR(100),
       joining_date DATE NOT NULL,
-      role ENUM('staff', 'head','admin') DEFAULT 'staff',
+      role ENUM('staff', 'head','admin','accountant') DEFAULT 'staff',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       updated_by VARCHAR(50)

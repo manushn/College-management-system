@@ -536,9 +536,16 @@ router.get("/gettimetable", async (req, res, next) => {
         [sem, dep]
       );
 
+    const [TimetableDescribe]=await db.promise().query(`SELECT course_code,course_name,staff_name from courses where sem= ? AND dep_name= ?`,[sem,dep]);
+
+
+
     return res.status(200).json({
       success: true,
-      timetable: Timetable || [],
+      timetable: {
+        Timetable:Timetable || [],
+        TimetableDescribe:TimetableDescribe||[]
+      },
     });
 
   } catch (error) {
@@ -627,13 +634,18 @@ router.get("/timetable/filter", async (req, res, next) => {
 
     const [timetables] = await db.promise().query(query, params);
 
+
+
     if (timetables.length < 1) {
       return res.status(203).json({ emessage: "No timetables found" });
     }
+    const { sem: tsem, dep: tdep } = timetables[0];
+    const [TimetableDescribe]=await db.promise().query(`SELECT course_code,course_name,staff_name from courses where sem= ? AND dep_name= ?`,[tsem,tdep]);
 
-    return res.status(200).json({ success: true, timetables });
+
+    return res.status(200).json({ success: true, timetables ,TimetableDescribe:TimetableDescribe||[]});
   } catch (error) {
-    
+    console.log(error)
     next(error);
     return res.status(500).json({ emessage: "Server error" });
   }

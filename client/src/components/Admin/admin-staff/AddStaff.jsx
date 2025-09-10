@@ -427,6 +427,7 @@ function AddStaff({ setStaffAdd, setEmessage, setMessage }) {
             <select name="role" value={staffData.role} onChange={handleSelectChange} required>
               <option value="">SELECT</option>
               <option value="staff">Staff</option>
+              <option value="accountant">Accountant</option>
               <option value="head">Head</option>
               <option value="admin">Admin</option>
             </select>
